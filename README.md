@@ -41,6 +41,20 @@ cz check --message "feat: add new medication parser"
 cz changelog
 ```
 
+## Cursor IDE integration
+
+This repository includes VS Code/Cursor workspace settings in `.vscode/`:
+
+- `tasks.json` with one-click tasks:
+  - `Farmaciola: Install Dev Dependencies`
+  - `Farmaciola: Lint (pre-commit all files)`
+  - `Farmaciola: Test (pytest)`
+  - `Farmaciola: CI Check (lint + test)`
+- `settings.json` for local `.venv` interpreter and pytest discovery
+- `extensions.json` recommendations for Python, Pylance, and Ruff
+
+Run tasks from `Terminal -> Run Task...` in Cursor.
+
 ## Conventional Commits
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) for all commits.

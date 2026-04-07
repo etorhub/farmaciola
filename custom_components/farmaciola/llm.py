@@ -1,4 +1,14 @@
-from anthropic import AsyncAnthropic
+try:
+    from anthropic import AsyncAnthropic
+except ModuleNotFoundError:
+
+    class AsyncAnthropic:  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ModuleNotFoundError(
+                "anthropic is not installed. Install project dependencies to use LLM features."
+            )
+
+
 from .const import CLAUDE_MODEL
 
 _PROMPT = """You are a medical information assistant. Write a 2-3 sentence plain-language summary of what this medicine is used for, its main active ingredient, and any important usage notes. Be concise and factual. Do not give dosage advice.
