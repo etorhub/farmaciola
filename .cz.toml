@@ -1,0 +1,12 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+version_scheme = "semver"
+tag_format = "v$version"
+update_changelog_on_bump = true
+changelog_file = "CHANGELOG.md"
+version_files = [
+  "custom_components/farmaciola/manifest.json:version"
+]
+bump_message = "chore(release): v$version [skip ci]"
+annotated_tag = true
