@@ -40,10 +40,12 @@ class FarmaciolaStorage:
         if medicine_id not in self._data:
             return False
         now = datetime.now(timezone.utc).isoformat()
+        original_created_at = self._data[medicine_id]["created_at"]
         self._data[medicine_id] = {
             **self._data[medicine_id],
             **data,
             "id": medicine_id,
+            "created_at": original_created_at,
             "updated_at": now,
         }
         await self._save()
