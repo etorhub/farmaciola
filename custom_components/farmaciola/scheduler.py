@@ -1,6 +1,10 @@
+import logging
 from datetime import date, timedelta
+
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.event import async_track_time_interval
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def check_expiry_and_notify(
@@ -47,7 +51,14 @@ async def check_expiry_and_notify(
 
 async def async_setup_scheduler(hass: HomeAssistant, storage, notify_service: str):
     async def _tick(now=None):
-        await check_expiry_and_notify(hass, storage, notify_service)
+        try:
+            await check_expiry_and_notify(hass, storage, notify_service)
+        except Exception:
+            _LOGGER.exception("Farmaciola expiry notification run failed")
 
-    await _tick()
+    try:
+        await _tick()
+    except Exception:
+        _LOGGER.exception("Farmaciola initial expiry check failed")
+
     return async_track_time_interval(hass, _tick, timedelta(hours=24))
