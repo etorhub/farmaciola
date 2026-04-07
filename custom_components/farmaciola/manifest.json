@@ -2,8 +2,10 @@
   "domain": "farmaciola",
   "name": "Farmaciola",
   "version": "0.3.0",
-  "documentation": "https://github.com/yourusername/farmaciola",
-  "requirements": ["anthropic>=0.40.0"],
+  "documentation": "https://github.com/etorhub/farmaciola",
+  "requirements": [
+    "anthropic>=0.40.0"
+  ],
   "dependencies": [],
   "codeowners": [],
   "iot_class": "local_push"
