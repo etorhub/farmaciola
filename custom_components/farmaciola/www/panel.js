@@ -53,6 +53,27 @@ const CSS = `
 .empty { text-align: center; color: var(--secondary-text-color); padding: 40px 20px; }
 .link { color: var(--primary-color); cursor: pointer; text-decoration: underline; }
 .hidden { display: none !important; }
+.stats-bar {
+  display: flex; gap: 10px; margin-bottom: 16px;
+}
+.stat-card {
+  flex: 1; background: var(--card-background-color); border-radius: 12px;
+  padding: 12px 10px; text-align: center; cursor: pointer;
+  border: 2px solid transparent; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.stat-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.stat-card.active { border-color: var(--primary-color); }
+.stat-card.active-warn { border-color: var(--warning-color, #f57f17); }
+.stat-card.active-danger { border-color: var(--error-color, #c62828); }
+.stat-num { font-size: 1.4rem; font-weight: 700; line-height: 1; }
+.stat-num.ok { color: var(--success-color, #43a047); }
+.stat-num.warn { color: var(--warning-color, #f57f17); }
+.stat-num.danger { color: var(--error-color, #c62828); }
+.stat-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary-text-color); margin-top: 4px; }
+.section-label {
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--primary-color); margin: 12px 0 8px;
+}
 #modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.5);
   display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px;
@@ -125,6 +146,7 @@ class FarmaciolaPanel extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this._medicines = [];
     this._filter = "";
+    this._statFilter = null; // null | "expiring" | "expired"
     this._formMode = "cima";
     this._form = {};
     this._cimaResults = [];
@@ -156,15 +178,20 @@ class FarmaciolaPanel extends HTMLElement {
     } catch {
       this._medicines = [];
     }
+    this._renderStats();
     this._renderList();
   }
 
   _filtered() {
-    if (!this._filter) return this._medicines;
+    let meds = this._medicines;
+    if (this._statFilter === "expired") {
+      meds = meds.filter((m) => this._days(m.fecha_caducidad) !== null && this._days(m.fecha_caducidad) < 0);
+    } else if (this._statFilter === "expiring") {
+      meds = meds.filter((m) => { const d = this._days(m.fecha_caducidad); return d !== null && d >= 0 && d <= 30; });
+    }
+    if (!this._filter) return meds;
     const q = this._filter.toLowerCase();
-    return this._medicines.filter((m) =>
-      (m.nombre || "").toLowerCase().includes(q)
-    );
+    return meds.filter((m) => (m.nombre || "").toLowerCase().includes(q));
   }
 
   _days(fecha) {
@@ -211,6 +238,7 @@ class FarmaciolaPanel extends HTMLElement {
           <input class="search" id="search" type="text" placeholder="Search medicines..." />
           <button class="btn-primary" id="addBtn">+ Add</button>
         </div>
+        <div id="stats"></div>
         <div id="list"></div>
         <div id="modal-overlay" class="hidden"></div>
       </div>`;
@@ -230,17 +258,50 @@ class FarmaciolaPanel extends HTMLElement {
       });
   }
 
+  _renderStats() {
+    const el = this.shadowRoot.getElementById("stats");
+    if (!el) return;
+    const total = this._medicines.length;
+    const expired = this._medicines.filter((m) => { const d = this._days(m.fecha_caducidad); return d !== null && d < 0; }).length;
+    const expiring = this._medicines.filter((m) => { const d = this._days(m.fecha_caducidad); return d !== null && d >= 0 && d <= 30; }).length;
+    const sf = this._statFilter;
+    el.innerHTML = `
+      <div class="stats-bar">
+        <div class="stat-card${sf === null ? " active" : ""}" id="sf-all">
+          <div class="stat-num ok">${total}</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card${sf === "expiring" ? " active-warn" : ""}" id="sf-expiring">
+          <div class="stat-num warn">${expiring}</div>
+          <div class="stat-label">Expiring</div>
+        </div>
+        <div class="stat-card${sf === "expired" ? " active-danger" : ""}" id="sf-expired">
+          <div class="stat-num danger">${expired}</div>
+          <div class="stat-label">Expired</div>
+        </div>
+      </div>`;
+    el.querySelector("#sf-all").addEventListener("click", () => { this._statFilter = null; this._renderStats(); this._renderList(); });
+    el.querySelector("#sf-expiring").addEventListener("click", () => { this._statFilter = this._statFilter === "expiring" ? null : "expiring"; this._renderStats(); this._renderList(); });
+    el.querySelector("#sf-expired").addEventListener("click", () => { this._statFilter = this._statFilter === "expired" ? null : "expired"; this._renderStats(); this._renderList(); });
+  }
+
   _renderList() {
     const list = this.shadowRoot.getElementById("list");
     const meds = this._filtered();
+    const sectionLabel = this._statFilter === "expired"
+      ? "Expired medicines"
+      : this._statFilter === "expiring"
+        ? "Expiring soon (≤ 30 days)"
+        : this._medicines.length ? "All medicines" : "";
+    const labelHtml = sectionLabel ? `<div class="section-label">${sectionLabel}</div>` : "";
     if (!meds.length) {
-      list.innerHTML = `<div class="empty">No medicines found. <span class="link" id="addLink">Add your first one.</span></div>`;
+      list.innerHTML = labelHtml + `<div class="empty">No medicines found. <span class="link" id="addLink">Add your first one.</span></div>`;
       list
         .querySelector("#addLink")
         ?.addEventListener("click", () => this._openAdd());
       return;
     }
-    list.innerHTML = meds
+    list.innerHTML = labelHtml + meds
       .map(
         (m) => `
       <div class="med-row" data-id="${m.id}">
