@@ -6,12 +6,14 @@
         "description": "Choose which Home Assistant notify service receives medicine expiry alerts.",
         "data": {"notify_service": "Notify service (e.g. notify.notify)"}
       }
-    }
+    },
+    "abort": {"already_configured": "Farmaciola is already configured."}
   },
   "options": {
     "step": {
       "init": {
         "title": "Farmaciola options",
+        "description": "Change the notification service used for expiry alerts.",
         "data": {
           "notify_service": "Notify service (e.g. notify.notify)"
         }
