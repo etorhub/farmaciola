@@ -1,0 +1,18 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Claude AI",
+        "description": "Enter your Anthropic API key to enable medicine summaries.",
+        "data": {"claude_api_key": "Claude API Key"}
+      },
+      "notify": {
+        "title": "Notification Service",
+        "description": "Which HA notify service should receive expiry alerts?",
+        "data": {"notify_service": "Notify service"}
+      }
+    },
+    "error": {"invalid_api_key": "Invalid API key. Check your Anthropic account."},
+    "abort": {"already_configured": "Farmaciola is already configured."}
+  }
+}

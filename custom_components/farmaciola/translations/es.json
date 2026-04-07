@@ -1,0 +1,18 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Conectar Claude AI",
+        "description": "Introduce tu clave API de Anthropic para habilitar los resúmenes de medicamentos.",
+        "data": {"claude_api_key": "Clave API de Claude"}
+      },
+      "notify": {
+        "title": "Servicio de notificaciones",
+        "description": "¿Qué servicio de notificación de HA debe recibir las alertas de caducidad?",
+        "data": {"notify_service": "Servicio de notificación"}
+      }
+    },
+    "error": {"invalid_api_key": "Clave API no válida. Comprueba tu cuenta de Anthropic."},
+    "abort": {"already_configured": "Farmaciola ya está configurado."}
+  }
+}

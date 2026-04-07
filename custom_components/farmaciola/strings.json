@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Claude API Key",
+        "data": {"claude_api_key": "Claude API Key"}
+      },
+      "notify": {
+        "title": "Notification Service",
+        "data": {"notify_service": "Notify service (e.g. notify.notify)"}
+      }
+    },
+    "error": {
+      "invalid_api_key": "Invalid API key. Please check your Claude API key."
+    }
+  }
+}
