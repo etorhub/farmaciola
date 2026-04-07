@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.4.3 (2026-04-07)
+
+### Refactor
+
+- remove Claude API key handling from config flow and related components, update UI and translations for notification service only
+
 ## v0.4.2 (2026-04-07)
 
 ### Fix
