@@ -1,0 +1,44 @@
+from anthropic import AsyncAnthropic
+from .const import CLAUDE_MODEL
+
+_PROMPT = """You are a medical information assistant. Write a 2-3 sentence plain-language summary of what this medicine is used for, its main active ingredient, and any important usage notes. Be concise and factual. Do not give dosage advice.
+
+Medicine: {nombre}
+Active ingredients: {principios_activos}
+Pharmaceutical form: {forma_farmaceutica}
+Administration route: {via_administracion}
+Prescription required: {prescripcion}"""
+
+
+class LLMClient:
+    def __init__(self, api_key: str):
+        self._client = AsyncAnthropic(api_key=api_key)
+
+    async def generate_summary(self, medicine: dict) -> str:
+        prompt = _PROMPT.format(
+            nombre=medicine.get("nombre", ""),
+            principios_activos=", ".join(medicine.get("principios_activos") or []),
+            forma_farmaceutica=medicine.get("forma_farmaceutica", ""),
+            via_administracion=medicine.get("via_administracion", ""),
+            prescripcion="Yes" if medicine.get("prescripcion") else "No",
+        )
+        try:
+            message = await self._client.messages.create(
+                model=CLAUDE_MODEL,
+                max_tokens=200,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            return message.content[0].text
+        except Exception:
+            return ""
+
+    async def validate_key(self) -> bool:
+        try:
+            await self._client.messages.create(
+                model=CLAUDE_MODEL,
+                max_tokens=5,
+                messages=[{"role": "user", "content": "test"}],
+            )
+            return True
+        except Exception:
+            return False
