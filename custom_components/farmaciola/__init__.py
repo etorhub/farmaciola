@@ -3,6 +3,7 @@ import logging
 
 import aiohttp
 from homeassistant.components.frontend import (
+    add_extra_js_url,
     async_register_built_in_panel,
     async_remove_panel,
 )
@@ -75,6 +76,7 @@ async def _async_register_http(hass: HomeAssistant) -> None:
         )
         raise RuntimeError("Unsupported Home Assistant HTTP static path API")
 
+    add_extra_js_url(hass, "/farmaciola_static/card.js")
     hass.data[_HTTP_REGISTERED_KEY] = True
 
 
