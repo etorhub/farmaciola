@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.3.1 (2026-04-07)
+
+### Fix
+
+- update documentation URL and format requirements in manifest.json
+
 ## v0.3.0 (2026-04-07)
 
 ### Feat
