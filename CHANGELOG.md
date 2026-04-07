@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.4.1 (2026-04-07)
+
+### Fix
+
+- enhance error handling and validation for LLMClient API key, update translations for error messages
+
 ## v0.4.0 (2026-04-07)
 
 ### Feat
