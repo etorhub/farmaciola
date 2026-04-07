@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.4.5 (2026-04-07)
+
+### Fix
+
+- stop re-rendering form on every keystroke in CIMA search input
+
+### Refactor
+
+- remove LLM/Claude remnants and clean up config flow
+
 ## v0.4.4 (2026-04-07)
 
 ### Fix
