@@ -412,9 +412,13 @@ class FarmaciolaPanel extends HTMLElement {
       cimaInput.addEventListener("input", (e) => {
         this._cimaQuery = e.target.value;
         clearTimeout(this._cimaDebounce);
+        const drop = ov.querySelector("#acDrop");
         if (this._cimaQuery.length < 2) {
           this._cimaResults = [];
-          this._renderForm(editing);
+          if (drop) {
+            drop.classList.add("hidden");
+            drop.innerHTML = "";
+          }
           return;
         }
         this._cimaDebounce = setTimeout(
@@ -437,7 +441,32 @@ class FarmaciolaPanel extends HTMLElement {
     } catch {
       this._cimaResults = [];
     }
-    this._renderForm(editing);
+    const drop = this._ov()?.querySelector("#acDrop");
+    if (drop) this._updateDrop(drop, editing);
+  }
+
+  _updateDrop(drop, editing) {
+    if (!this._cimaResults.length) {
+      drop.classList.add("hidden");
+      drop.innerHTML = "";
+      return;
+    }
+    drop.classList.remove("hidden");
+    drop.innerHTML = this._cimaResults
+      .map(
+        (r) => `
+      <div class="ac-item" data-nr="${r.nregistro}">
+        ${r.foto_url ? `<img class="ac-thumb" src="${r.foto_url}" />` : `<div class="ac-thumb-ph">💊</div>`}
+        <div class="ac-info"><div class="ac-name">${r.nombre}</div><div class="ac-sub">${[r.forma_farmaceutica, r.laboratorio].filter(Boolean).join(" · ")}</div></div>
+        ${r.dosis ? `<span class="ac-pill">${r.dosis}</span>` : ""}
+      </div>`
+      )
+      .join("");
+    drop.querySelectorAll(".ac-item").forEach((item) =>
+      item.addEventListener("click", () =>
+        this._selectCima(item.dataset.nr, editing)
+      )
+    );
   }
 
   async _selectCima(nregistro, editing) {
