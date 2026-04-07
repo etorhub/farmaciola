@@ -1,7 +1,7 @@
 {
   "domain": "farmaciola",
   "name": "Farmaciola",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "documentation": "https://github.com/etorhub/farmaciola",
   "config_flow": true,
   "requirements": [],
