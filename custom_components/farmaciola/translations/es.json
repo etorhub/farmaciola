@@ -12,7 +12,16 @@
         "data": {"notify_service": "Servicio de notificación"}
       }
     },
-    "error": {"invalid_api_key": "Clave API no válida. Comprueba tu cuenta de Anthropic."},
+    "error": {
+      "invalid_api_key": "Clave API no válida. Comprueba que la clave sea correcta y esté activa en la consola de Anthropic.",
+      "permission_denied": "Acceso denegado para esta clave (cuenta, facturación u organización).",
+      "cannot_connect": "No se pudo conectar con Anthropic (red, DNS, cortafuegos o proxy). Comprueba la salida HTTPS de Home Assistant.",
+      "dependency_missing": "Falta el paquete Python anthropic. Reinicia Home Assistant tras instalar la integración para que se instalen dependencias.",
+      "model_not_found": "No se encontró el modelo Claude usado por la integración. Puede que necesites una actualización o que tu cuenta no tenga acceso a ese modelo.",
+      "rate_limit": "Límite de velocidad de Anthropic alcanzado. Espera un momento e inténtalo de nuevo.",
+      "bad_request": "Anthropic rechazó la petición. Consulta el registro de Home Assistant.",
+      "api_error": "Error inesperado de Anthropic. Consulta el registro de Home Assistant."
+    },
     "abort": {"already_configured": "Farmaciola ya está configurado."}
   },
   "options": {
@@ -26,6 +35,15 @@
         }
       }
     },
-    "error": {"invalid_api_key": "Clave API no válida. Comprueba tu cuenta de Anthropic."}
+    "error": {
+      "invalid_api_key": "Clave API no válida. Comprueba que la clave sea correcta y esté activa en la consola de Anthropic.",
+      "permission_denied": "Acceso denegado para esta clave (cuenta, facturación u organización).",
+      "cannot_connect": "No se pudo conectar con Anthropic (red, DNS, cortafuegos o proxy). Comprueba la salida HTTPS de Home Assistant.",
+      "dependency_missing": "Falta el paquete Python anthropic. Reinicia Home Assistant tras instalar la integración para que se instalen dependencias.",
+      "model_not_found": "No se encontró el modelo Claude usado por la integración. Puede que necesites una actualización o que tu cuenta no tenga acceso a ese modelo.",
+      "rate_limit": "Límite de velocidad de Anthropic alcanzado. Espera un momento e inténtalo de nuevo.",
+      "bad_request": "Anthropic rechazó la petición. Consulta el registro de Home Assistant.",
+      "api_error": "Error inesperado de Anthropic. Consulta el registro de Home Assistant."
+    }
   }
 }

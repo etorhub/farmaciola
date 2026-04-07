@@ -22,10 +22,11 @@ class FarmaciolaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 self._api_key = ""
                 return await self.async_step_notify()
             client = LLMClient(raw)
-            if await client.validate_key():
+            ok, err_key = await client.validate_key()
+            if ok:
                 self._api_key = raw
                 return await self.async_step_notify()
-            errors[CONF_CLAUDE_API_KEY] = "invalid_api_key"
+            errors[CONF_CLAUDE_API_KEY] = err_key or "invalid_api_key"
 
         return self.async_show_form(
             step_id="user",
@@ -69,8 +70,9 @@ class FarmaciolaOptionsFlow(config_entries.OptionsFlow):
             new_key = (user_input.get(CONF_CLAUDE_API_KEY) or "").strip()
             if new_key:
                 client = LLMClient(new_key)
-                if not await client.validate_key():
-                    errors[CONF_CLAUDE_API_KEY] = "invalid_api_key"
+                ok, err_key = await client.validate_key()
+                if not ok:
+                    errors[CONF_CLAUDE_API_KEY] = err_key or "invalid_api_key"
             if not errors:
                 preserved_opts = dict(self._config_entry.options)
                 new_data = {**self._config_entry.data}

@@ -1,4 +1,6 @@
+from anthropic import APIConnectionError, AuthenticationError
 from unittest.mock import AsyncMock, MagicMock, patch
+
 from custom_components.farmaciola.llm import LLMClient
 
 SAMPLE_MEDICINE = {
@@ -33,6 +35,32 @@ async def test_generate_summary_skips_without_api_key():
     client = LLMClient(None)
     summary = await client.generate_summary(SAMPLE_MEDICINE)
     assert summary == ""
+
+
+async def test_validate_key_maps_authentication_error():
+    with patch("custom_components.farmaciola.llm.AsyncAnthropic") as MockAnthropic:
+        mock_client = AsyncMock()
+        MockAnthropic.return_value = mock_client
+        resp = MagicMock()
+        err = AuthenticationError("bad", response=resp, body=None)
+        mock_client.messages.create = AsyncMock(side_effect=err)
+        client = LLMClient("sk-ant-test")
+        ok, key = await client.validate_key()
+        assert ok is False
+        assert key == "invalid_api_key"
+
+
+async def test_validate_key_maps_connection_error():
+    with patch("custom_components.farmaciola.llm.AsyncAnthropic") as MockAnthropic:
+        mock_client = AsyncMock()
+        MockAnthropic.return_value = mock_client
+        req = MagicMock()
+        err = APIConnectionError(message="unreachable", request=req)
+        mock_client.messages.create = AsyncMock(side_effect=err)
+        client = LLMClient("sk-ant-test")
+        ok, key = await client.validate_key()
+        assert ok is False
+        assert key == "cannot_connect"
 
 
 async def test_generate_summary_returns_empty_on_error():

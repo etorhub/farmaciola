@@ -12,7 +12,14 @@
       }
     },
     "error": {
-      "invalid_api_key": "Invalid API key. Please check your Claude API key."
+      "invalid_api_key": "Invalid API key. Please check your Claude API key.",
+      "permission_denied": "Access denied for this API key.",
+      "cannot_connect": "Could not reach Anthropic. Check network and HTTPS.",
+      "dependency_missing": "The anthropic package is not installed. Restart Home Assistant after installing the integration.",
+      "model_not_found": "Claude model not available for this key or API.",
+      "rate_limit": "Rate limit reached. Try again shortly.",
+      "bad_request": "Anthropic rejected the request. Check logs.",
+      "api_error": "Unexpected Anthropic error. Check logs."
     }
   },
   "options": {
@@ -26,7 +33,14 @@
       }
     },
     "error": {
-      "invalid_api_key": "Invalid API key. Please check your Claude API key."
+      "invalid_api_key": "Invalid API key. Please check your Claude API key.",
+      "permission_denied": "Access denied for this API key.",
+      "cannot_connect": "Could not reach Anthropic. Check network and HTTPS.",
+      "dependency_missing": "The anthropic package is not installed. Restart Home Assistant after installing the integration.",
+      "model_not_found": "Claude model not available for this key or API.",
+      "rate_limit": "Rate limit reached. Try again shortly.",
+      "bad_request": "Anthropic rejected the request. Check logs.",
+      "api_error": "Unexpected Anthropic error. Check logs."
     }
   }
 }
