@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.4.0 (2026-04-07)
+
+### Feat
+
+- improve LLMClient initialization and config flow handling for optional API key
+
 ## v0.3.2 (2026-04-07)
 
 ### Fix
