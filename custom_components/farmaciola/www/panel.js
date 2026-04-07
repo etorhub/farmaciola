@@ -151,6 +151,7 @@ class FarmaciolaPanel extends HTMLElement {
     this._form = {};
     this._cimaResults = [];
     this._cimaQuery = "";
+    this._cimaSelStart = 0;
     this._cimaDebounce = null;
     this._ready = false;
   }
@@ -375,6 +376,7 @@ class FarmaciolaPanel extends HTMLElement {
     this._formMode = "cima";
     this._cimaResults = [];
     this._cimaQuery = "";
+    this._cimaSelStart = 0;
     this._renderForm(null);
   }
 
@@ -414,7 +416,7 @@ class FarmaciolaPanel extends HTMLElement {
             </div>`
               : `<div class="form-group">
               <label class="form-label">Medicine name</label>
-              <input class="form-input" id="cimaQ" type="text" placeholder="Type to search CIMA..." value="${this._cimaQuery}" autocomplete="off" />
+              <input class="form-input" id="cimaQ" type="text" placeholder="Type to search CIMA..." autocomplete="off" />
               <div id="acDrop" class="ac-dropdown ${this._cimaResults.length ? "" : "hidden"}">
                 ${this._cimaResults
                   .map(
@@ -459,6 +461,7 @@ class FarmaciolaPanel extends HTMLElement {
     ov.querySelector("#chgBtn")?.addEventListener("click", () => {
       this._form = { source: "cima" };
       this._cimaQuery = "";
+      this._cimaSelStart = 0;
       this._cimaResults = [];
       this._renderForm(editing);
     });
@@ -469,9 +472,12 @@ class FarmaciolaPanel extends HTMLElement {
     );
     const cimaInput = ov.querySelector("#cimaQ");
     if (cimaInput) {
+      cimaInput.value = this._cimaQuery;
       cimaInput.focus();
+      cimaInput.setSelectionRange(this._cimaSelStart, this._cimaSelStart);
       cimaInput.addEventListener("input", (e) => {
         this._cimaQuery = e.target.value;
+        this._cimaSelStart = e.target.selectionStart;
         clearTimeout(this._cimaDebounce);
         const drop = ov.querySelector("#acDrop");
         if (this._cimaQuery.length < 2) {
@@ -606,6 +612,7 @@ class FarmaciolaPanel extends HTMLElement {
     ov.innerHTML = "";
     this._cimaResults = [];
     this._cimaQuery = "";
+    this._cimaSelStart = 0;
   }
 
   _toBase64(file) {
