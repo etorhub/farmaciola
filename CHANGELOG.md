@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.4.2 (2026-04-07)
+
+### Fix
+
+- update CLAUDE_MODEL alias and enhance error logging for LLMClient
+
 ## v0.4.1 (2026-04-07)
 
 ### Fix
