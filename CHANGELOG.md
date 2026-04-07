@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.4.4 (2026-04-07)
+
+### Fix
+
+- enhance HTTP registration and error handling in Farmaciola integration
+
 ## v0.4.3 (2026-04-07)
 
 ### Refactor
