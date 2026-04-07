@@ -29,6 +29,12 @@ async def test_generate_summary_returns_string():
         assert "Ibuprofeno Kern Pharma 600mg" in call_kwargs["messages"][0]["content"]
 
 
+async def test_generate_summary_skips_without_api_key():
+    client = LLMClient(None)
+    summary = await client.generate_summary(SAMPLE_MEDICINE)
+    assert summary == ""
+
+
 async def test_generate_summary_returns_empty_on_error():
     with patch("custom_components.farmaciola.llm.AsyncAnthropic") as MockAnthropic:
         mock_client = AsyncMock()

@@ -9,6 +9,8 @@ except ModuleNotFoundError:
             )
 
 
+from typing import Optional
+
 from .const import CLAUDE_MODEL
 
 _PROMPT = """You are a medical information assistant. Write a 2-3 sentence plain-language summary of what this medicine is used for, its main active ingredient, and any important usage notes. Be concise and factual. Do not give dosage advice.
@@ -21,10 +23,13 @@ Prescription required: {prescripcion}"""
 
 
 class LLMClient:
-    def __init__(self, api_key: str):
-        self._client = AsyncAnthropic(api_key=api_key)
+    def __init__(self, api_key: Optional[str]):
+        key = (api_key or "").strip()
+        self._client = AsyncAnthropic(api_key=key) if key else None
 
     async def generate_summary(self, medicine: dict) -> str:
+        if not self._client:
+            return ""
         prompt = _PROMPT.format(
             nombre=medicine.get("nombre", ""),
             principios_activos=", ".join(medicine.get("principios_activos") or []),
@@ -43,6 +48,8 @@ class LLMClient:
             return ""
 
     async def validate_key(self) -> bool:
+        if not self._client:
+            return False
         try:
             await self._client.messages.create(
                 model=CLAUDE_MODEL,

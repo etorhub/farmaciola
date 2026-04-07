@@ -3,8 +3,8 @@
     "step": {
       "user": {
         "title": "Conectar Claude AI",
-        "description": "Introduce tu clave API de Anthropic para habilitar los resúmenes de medicamentos.",
-        "data": {"claude_api_key": "Clave API de Claude"}
+        "description": "Opcional. Añade tu clave API de Anthropic para resúmenes generados por IA, o déjala en blanco y configúrala después en las opciones de la integración.",
+        "data": {"claude_api_key": "Clave API de Claude (opcional)"}
       },
       "notify": {
         "title": "Servicio de notificaciones",
@@ -14,5 +14,18 @@
     },
     "error": {"invalid_api_key": "Clave API no válida. Comprueba tu cuenta de Anthropic."},
     "abort": {"already_configured": "Farmaciola ya está configurado."}
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opciones de Farmaciola",
+        "description": "Añade o cambia la clave API y el servicio de notificaciones.",
+        "data": {
+          "claude_api_key": "Clave API de Claude (opcional)",
+          "notify_service": "Servicio de notificación"
+        }
+      }
+    },
+    "error": {"invalid_api_key": "Clave API no válida. Comprueba tu cuenta de Anthropic."}
   }
 }

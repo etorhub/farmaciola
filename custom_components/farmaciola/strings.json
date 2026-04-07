@@ -3,11 +3,26 @@
     "step": {
       "user": {
         "title": "Claude API Key",
-        "data": {"claude_api_key": "Claude API Key"}
+        "description": "Optional. Leave empty to set up without AI summaries; add a key later in integration options.",
+        "data": {"claude_api_key": "Claude API Key (optional)"}
       },
       "notify": {
         "title": "Notification Service",
         "data": {"notify_service": "Notify service (e.g. notify.notify)"}
+      }
+    },
+    "error": {
+      "invalid_api_key": "Invalid API key. Please check your Claude API key."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Farmaciola options",
+        "data": {
+          "claude_api_key": "Claude API Key (optional)",
+          "notify_service": "Notify service (e.g. notify.notify)"
+        }
       }
     },
     "error": {
