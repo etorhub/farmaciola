@@ -110,9 +110,6 @@ const CSS = `
 .chip { font-size: 0.68rem; font-weight: 600; border-radius: 999px; padding: 3px 10px; }
 .chip-p { background: color-mix(in srgb, var(--primary-color) 15%, transparent); color: var(--primary-color); }
 .chip-r { background: color-mix(in srgb, var(--error-color, #c62828) 15%, transparent); color: var(--error-color, #c62828); }
-.summary-box { background: var(--secondary-background-color); border-radius: 12px; padding: 10px 12px; margin-bottom: 14px; border-left: 3px solid var(--primary-color); }
-.summary-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--primary-color); margin-bottom: 4px; }
-.summary-text { font-size: 0.8rem; line-height: 1.5; }
 .d-rows { margin-bottom: 14px; }
 .d-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--divider-color); font-size: 0.8rem; gap: 8px; }
 .d-row:last-child { border-bottom: none; }
@@ -165,10 +162,8 @@ class FarmaciolaPanel extends HTMLElement {
   _filtered() {
     if (!this._filter) return this._medicines;
     const q = this._filter.toLowerCase();
-    return this._medicines.filter(
-      (m) =>
-        (m.nombre || "").toLowerCase().includes(q) ||
-        (m.summary || "").toLowerCase().includes(q)
+    return this._medicines.filter((m) =>
+      (m.nombre || "").toLowerCase().includes(q)
     );
   }
 
@@ -213,7 +208,7 @@ class FarmaciolaPanel extends HTMLElement {
       <div id="app">
         <div class="header">
           <div class="title">Farmaciola 💊</div>
-          <input class="search" id="search" type="text" placeholder="Search medicines or symptoms..." />
+          <input class="search" id="search" type="text" placeholder="Search medicines..." />
           <button class="btn-primary" id="addBtn">+ Add</button>
         </div>
         <div id="list"></div>
@@ -292,7 +287,6 @@ class FarmaciolaPanel extends HTMLElement {
           ${med.dosis ? `<span class="chip chip-p">${med.dosis}</span>` : ""}
           ${med.prescripcion ? `<span class="chip chip-r">Prescription required</span>` : ""}
         </div>
-        ${med.summary ? `<div class="summary-box"><div class="summary-label">✨ Summary</div><div class="summary-text">${med.summary}</div></div>` : ""}
         <div class="d-rows">
           <div class="d-row"><span>Active ingredients</span><span>${(med.principios_activos || []).join(", ") || "—"}</span></div>
           <div class="d-row"><span>Lab</span><span>${med.laboratorio || "—"}</span></div>

@@ -2,24 +2,10 @@
   "config": {
     "step": {
       "user": {
-        "title": "Claude API Key",
-        "description": "Optional. Leave empty to set up without AI summaries; add a key later in integration options.",
-        "data": {"claude_api_key": "Claude API Key (optional)"}
-      },
-      "notify": {
         "title": "Notification Service",
+        "description": "Choose which Home Assistant notify service receives medicine expiry alerts.",
         "data": {"notify_service": "Notify service (e.g. notify.notify)"}
       }
-    },
-    "error": {
-      "invalid_api_key": "Invalid API key. Please check your Claude API key.",
-      "permission_denied": "Access denied for this API key.",
-      "cannot_connect": "Could not reach Anthropic. Check network and HTTPS.",
-      "dependency_missing": "The anthropic package is not installed. Restart Home Assistant after installing the integration.",
-      "model_not_found": "Claude model not available for this key or API.",
-      "rate_limit": "Rate limit reached. Try again shortly.",
-      "bad_request": "Anthropic rejected the request. Expand the log line for body= (API message).",
-      "api_error": "Unexpected Anthropic error. Check logs."
     }
   },
   "options": {
@@ -27,20 +13,9 @@
       "init": {
         "title": "Farmaciola options",
         "data": {
-          "claude_api_key": "Claude API Key (optional)",
           "notify_service": "Notify service (e.g. notify.notify)"
         }
       }
-    },
-    "error": {
-      "invalid_api_key": "Invalid API key. Please check your Claude API key.",
-      "permission_denied": "Access denied for this API key.",
-      "cannot_connect": "Could not reach Anthropic. Check network and HTTPS.",
-      "dependency_missing": "The anthropic package is not installed. Restart Home Assistant after installing the integration.",
-      "model_not_found": "Claude model not available for this key or API.",
-      "rate_limit": "Rate limit reached. Try again shortly.",
-      "bad_request": "Anthropic rejected the request. Expand the log line for body= (API message).",
-      "api_error": "Unexpected Anthropic error. Check logs."
     }
   }
 }

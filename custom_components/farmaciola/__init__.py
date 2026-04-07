@@ -8,13 +8,7 @@ from homeassistant.core import HomeAssistant
 
 from .api import CimaDetailView, CimaSearchView, MedicineView, MedicinesView
 from .cima import CimaClient
-from .const import (
-    CONF_CLAUDE_API_KEY,
-    CONF_NOTIFY_SERVICE,
-    DEFAULT_NOTIFY_SERVICE,
-    DOMAIN,
-)
-from .llm import LLMClient
+from .const import CONF_NOTIFY_SERVICE, DEFAULT_NOTIFY_SERVICE, DOMAIN
 from .scheduler import async_setup_scheduler
 from .storage import FarmaciolaStorage
 
@@ -53,13 +47,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     storage = await FarmaciolaStorage(hass).async_load()
     session = aiohttp.ClientSession()
     cima = CimaClient(session)
-    llm = LLMClient(entry.data.get(CONF_CLAUDE_API_KEY))
     notify_service = entry.data.get(CONF_NOTIFY_SERVICE, DEFAULT_NOTIFY_SERVICE)
 
     hass.data[DOMAIN] = {
         "storage": storage,
         "cima": cima,
-        "llm": llm,
         "session": session,
     }
 

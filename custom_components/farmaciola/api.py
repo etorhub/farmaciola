@@ -12,16 +12,11 @@ class MedicinesView(HomeAssistantView):
         return self.json(storage.get_all())
 
     async def post(self, request):
-        hass = request.app["hass"]
-        storage = hass.data[DOMAIN]["storage"]
-        llm = hass.data[DOMAIN]["llm"]
+        storage = request.app["hass"].data[DOMAIN]["storage"]
         try:
             data = await request.json()
         except Exception:
             return self.json({"error": "Invalid JSON"}, status_code=400)
-
-        if data.get("source") == "cima" and not data.get("summary"):
-            data["summary"] = await llm.generate_summary(data)
 
         medicine_id = await storage.add_medicine(data)
         return self.json(storage.get_by_id(medicine_id), status_code=201)
@@ -33,8 +28,7 @@ class MedicineView(HomeAssistantView):
     requires_auth = True
 
     async def put(self, request, medicine_id):
-        hass = request.app["hass"]
-        storage = hass.data[DOMAIN]["storage"]
+        storage = request.app["hass"].data[DOMAIN]["storage"]
         try:
             data = await request.json()
         except Exception:
