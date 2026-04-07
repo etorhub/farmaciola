@@ -17,11 +17,30 @@ try:
         NotFoundError,
         PermissionDeniedError,
         RateLimitError,
+        UnprocessableEntityError,
     )
 
     _ANTHROPIC_AVAILABLE = True
 except ModuleNotFoundError:
     pass
+
+
+def _log_claude_exception(prefix: str, err: BaseException) -> None:
+    """Log SDK errors with response body when present (explains 400/422 messages)."""
+    body = getattr(err, "body", None)
+    request_id = getattr(err, "request_id", None)
+    if body is not None or request_id is not None:
+        _LOGGER.warning(
+            "%s (%s): %s request_id=%s body=%s",
+            prefix,
+            type(err).__name__,
+            err,
+            request_id,
+            body,
+        )
+    else:
+        _LOGGER.warning("%s (%s): %s", prefix, type(err).__name__, err)
+
 
 _PROMPT = """You are a medical information assistant. Write a 2-3 sentence plain-language summary of what this medicine is used for, its main active ingredient, and any important usage notes. Be concise and factual. Do not give dosage advice.
 
@@ -42,7 +61,7 @@ def _validation_error_key(exc: BaseException) -> str:
         return "rate_limit"
     if isinstance(exc, NotFoundError):
         return "model_not_found"
-    if isinstance(exc, BadRequestError):
+    if isinstance(exc, (BadRequestError, UnprocessableEntityError)):
         return "bad_request"
     if isinstance(exc, (APIConnectionError, APITimeoutError)):
         return "cannot_connect"
@@ -75,11 +94,7 @@ class LLMClient:
             )
             return message.content[0].text
         except Exception as err:
-            _LOGGER.warning(
-                "Claude summary request failed (%s): %s",
-                type(err).__name__,
-                err,
-            )
+            _log_claude_exception("Claude summary request failed", err)
             return ""
 
     async def validate_key(self) -> Tuple[bool, Optional[str]]:
@@ -95,15 +110,12 @@ class LLMClient:
         try:
             await self._client.messages.create(
                 model=CLAUDE_MODEL,
-                max_tokens=5,
-                messages=[{"role": "user", "content": "test"}],
+                # Avoid very small max_tokens — some accounts/models return 400.
+                max_tokens=64,
+                messages=[{"role": "user", "content": "Reply with OK."}],
             )
             return True, None
         except Exception as err:
             key = _validation_error_key(err)
-            _LOGGER.warning(
-                "Claude API key validation failed (%s): %s",
-                type(err).__name__,
-                err,
-            )
+            _log_claude_exception("Claude API key validation failed", err)
             return False, key

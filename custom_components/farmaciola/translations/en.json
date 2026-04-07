@@ -19,7 +19,7 @@
       "dependency_missing": "The anthropic Python package is missing. Restart Home Assistant after installing the integration so dependencies install.",
       "model_not_found": "The Claude model used by this integration was not found. You may need an integration update, or your account may not have access to this model.",
       "rate_limit": "Anthropic rate limit reached. Wait a moment and try again.",
-      "bad_request": "Anthropic rejected the request. See the Home Assistant log for details.",
+      "bad_request": "Anthropic rejected the request (invalid parameters or model). Open the log entry to read the API error message in body=.",
       "api_error": "Unexpected error from Anthropic. See the Home Assistant log for details."
     },
     "abort": {"already_configured": "Farmaciola is already configured."}
@@ -42,7 +42,7 @@
       "dependency_missing": "The anthropic Python package is missing. Restart Home Assistant after installing the integration so dependencies install.",
       "model_not_found": "The Claude model used by this integration was not found. You may need an integration update, or your account may not have access to this model.",
       "rate_limit": "Anthropic rate limit reached. Wait a moment and try again.",
-      "bad_request": "Anthropic rejected the request. See the Home Assistant log for details.",
+      "bad_request": "Anthropic rejected the request (invalid parameters or model). Open the log entry to read the API error message in body=.",
       "api_error": "Unexpected error from Anthropic. See the Home Assistant log for details."
     }
   }

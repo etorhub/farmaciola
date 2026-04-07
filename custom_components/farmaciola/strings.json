@@ -18,7 +18,7 @@
       "dependency_missing": "The anthropic package is not installed. Restart Home Assistant after installing the integration.",
       "model_not_found": "Claude model not available for this key or API.",
       "rate_limit": "Rate limit reached. Try again shortly.",
-      "bad_request": "Anthropic rejected the request. Check logs.",
+      "bad_request": "Anthropic rejected the request. Expand the log line for body= (API message).",
       "api_error": "Unexpected Anthropic error. Check logs."
     }
   },
@@ -39,7 +39,7 @@
       "dependency_missing": "The anthropic package is not installed. Restart Home Assistant after installing the integration.",
       "model_not_found": "Claude model not available for this key or API.",
       "rate_limit": "Rate limit reached. Try again shortly.",
-      "bad_request": "Anthropic rejected the request. Check logs.",
+      "bad_request": "Anthropic rejected the request. Expand the log line for body= (API message).",
       "api_error": "Unexpected Anthropic error. Check logs."
     }
   }

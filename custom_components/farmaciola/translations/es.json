@@ -19,7 +19,7 @@
       "dependency_missing": "Falta el paquete Python anthropic. Reinicia Home Assistant tras instalar la integración para que se instalen dependencias.",
       "model_not_found": "No se encontró el modelo Claude usado por la integración. Puede que necesites una actualización o que tu cuenta no tenga acceso a ese modelo.",
       "rate_limit": "Límite de velocidad de Anthropic alcanzado. Espera un momento e inténtalo de nuevo.",
-      "bad_request": "Anthropic rechazó la petición. Consulta el registro de Home Assistant.",
+      "bad_request": "Anthropic rechazó la petición. Abre la entrada del registro y busca body= con el mensaje de la API.",
       "api_error": "Error inesperado de Anthropic. Consulta el registro de Home Assistant."
     },
     "abort": {"already_configured": "Farmaciola ya está configurado."}
@@ -42,7 +42,7 @@
       "dependency_missing": "Falta el paquete Python anthropic. Reinicia Home Assistant tras instalar la integración para que se instalen dependencias.",
       "model_not_found": "No se encontró el modelo Claude usado por la integración. Puede que necesites una actualización o que tu cuenta no tenga acceso a ese modelo.",
       "rate_limit": "Límite de velocidad de Anthropic alcanzado. Espera un momento e inténtalo de nuevo.",
-      "bad_request": "Anthropic rechazó la petición. Consulta el registro de Home Assistant.",
+      "bad_request": "Anthropic rechazó la petición. Abre la entrada del registro y busca body= con el mensaje de la API.",
       "api_error": "Error inesperado de Anthropic. Consulta el registro de Home Assistant."
     }
   }
