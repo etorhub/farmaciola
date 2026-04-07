@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.5.0 (2026-04-07)
+
+### Feat
+
+- add dashboard stats bar with expiry filters to panel
+
 ## v0.4.5 (2026-04-07)
 
 ### Fix
