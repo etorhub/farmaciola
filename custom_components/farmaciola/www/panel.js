@@ -311,7 +311,7 @@ class FarmaciolaPanel extends HTMLElement {
           <div class="med-name">${m.nombre || "—"}</div>
           <div class="med-sub">${[m.dosis, m.laboratorio].filter(Boolean).join(" · ") || "—"}</div>
         </div>
-        <div class="med-expiry" style="color:${this._expiryColor(m.fecha_caducidad)}">${this._expiryText(m.fecha_caducidad)}</div>
+        <div class="med-expiry" style="color:${m.no_caduca ? 'var(--secondary-text-color)' : this._expiryColor(m.fecha_caducidad)}">${m.no_caduca ? 'Sin caducidad' : this._expiryText(m.fecha_caducidad)}</div>
       </div>`
       )
       .join("");
@@ -352,7 +352,7 @@ class FarmaciolaPanel extends HTMLElement {
         <div class="d-rows">
           <div class="d-row"><span>Active ingredients</span><span>${(med.principios_activos || []).join(", ") || "—"}</span></div>
           <div class="d-row"><span>Lab</span><span>${med.laboratorio || "—"}</span></div>
-          <div class="d-row"><span>Expiry</span><span style="color:${this._expiryColor(med.fecha_caducidad)}">${med.fecha_caducidad ? new Date(med.fecha_caducidad).toLocaleDateString("es-ES", { month: "long", year: "numeric" }) : "—"}</span></div>
+          <div class="d-row"><span>Expiry</span><span style="color:${med.no_caduca ? 'var(--secondary-text-color)' : this._expiryColor(med.fecha_caducidad)}">${med.no_caduca ? 'Sin caducidad' : (med.fecha_caducidad ? new Date(med.fecha_caducidad).toLocaleDateString("es-ES", { month: "long", year: "numeric" }) : "—")}</span></div>
           <div class="d-row"><span>Notes</span><span>${med.notas || "—"}</span></div>
         </div>
         <div class="modal-actions">
@@ -435,7 +435,8 @@ class FarmaciolaPanel extends HTMLElement {
           <div class="form-group"><label class="form-label">Pharmaceutical form</label><input class="form-input" id="mForma" type="text" value="${this._form.forma_farmaceutica || ""}" /></div>
           <div class="form-group"><label class="form-label">Photo (optional)</label><input class="form-input" id="mPhoto" type="file" accept="image/*" /></div>`
         }
-        <div class="form-group"><label class="form-label">Expiry date *</label><input class="form-input" id="expiry" type="month" value="${this._form.fecha_caducidad ? this._form.fecha_caducidad.substring(0, 7) : ""}" /></div>
+        <div class="form-group" id="expiryRow"${this._form.no_caduca ? ' style="display:none"' : ''}><label class="form-label">Expiry date *</label><input class="form-input" id="expiry" type="month" value="${this._form.fecha_caducidad ? this._form.fecha_caducidad.substring(0, 7) : ""}" /></div>
+        <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.875rem"><input type="checkbox" id="noCaduca"${this._form.no_caduca ? ' checked' : ''}> Sin fecha de caducidad</label></div>
         <div class="form-group"><label class="form-label">Notes</label><input class="form-input" id="notes" type="text" placeholder="Optional..." value="${this._form.notas || ""}" /></div>
         <div class="modal-actions">
           <button class="btn-secondary" id="cancelBtn">Cancel</button>
@@ -494,6 +495,11 @@ class FarmaciolaPanel extends HTMLElement {
         );
       });
     }
+    const noCaducaEl = ov.querySelector("#noCaduca");
+    const expiryRow = ov.querySelector("#expiryRow");
+    noCaducaEl?.addEventListener("change", () => {
+      expiryRow.style.display = noCaducaEl.checked ? "none" : "";
+    });
     ov.querySelector("#saveBtn").addEventListener("click", () =>
       this._save(editing)
     );
@@ -551,12 +557,13 @@ class FarmaciolaPanel extends HTMLElement {
 
   async _save(editing) {
     const ov = this._ov();
+    const noCaduca = ov.querySelector("#noCaduca")?.checked || false;
     const expiryVal = ov.querySelector("#expiry")?.value;
-    if (!expiryVal) {
-      alert("Expiry date is required");
+    if (!noCaduca && !expiryVal) {
+      alert("Indica la fecha de caducidad o marca 'Sin fecha de caducidad'");
       return;
     }
-    const fecha_caducidad = expiryVal + "-01";
+    const fecha_caducidad = noCaduca ? null : expiryVal + "-01";
     const notas = ov.querySelector("#notes")?.value || "";
     let body;
     if (this._formMode === "cima") {
@@ -564,7 +571,7 @@ class FarmaciolaPanel extends HTMLElement {
         alert("Please select a medicine from CIMA");
         return;
       }
-      body = { ...this._form, fecha_caducidad, notas };
+      body = { ...this._form, fecha_caducidad, no_caduca: noCaduca, notas };
     } else {
       const nombre = ov.querySelector("#mName")?.value?.trim();
       if (!nombre) {
@@ -577,6 +584,7 @@ class FarmaciolaPanel extends HTMLElement {
         dosis: ov.querySelector("#mDosis")?.value || "",
         forma_farmaceutica: ov.querySelector("#mForma")?.value || "",
         fecha_caducidad,
+        no_caduca: noCaduca,
         notas,
       };
       const file = ov.querySelector("#mPhoto")?.files?.[0];

@@ -12,6 +12,8 @@ async def check_expiry_and_notify(
 ) -> None:
     today = date.today()
     for medicine in storage.get_all():
+        if medicine.get("no_caduca"):
+            continue
         if not medicine.get("fecha_caducidad"):
             continue
         if medicine.get("notified_at"):
