@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.7.2 (2026-04-08)
+
+### Fix
+
+- **expiry**: treat medicines as expired only after their month has fully passed
+
 ## v0.7.1 (2026-04-08)
 
 ### Fix
