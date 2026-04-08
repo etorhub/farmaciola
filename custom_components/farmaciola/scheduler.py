@@ -22,15 +22,11 @@ async def check_expiry_and_notify(
             expiry = date.fromisoformat(medicine["fecha_caducidad"])
         except ValueError:
             continue
-        days_remaining = (expiry - today).days
-        if 0 <= days_remaining <= 7:
+        expiry_month_start = date(expiry.year, expiry.month, 1)
+        if today >= expiry_month_start:
             nombre = medicine.get("nombre", "Unknown medicine")
-            expiry_str = expiry.strftime("%d/%m/%Y")
-            message = (
-                f"⚠ {nombre} expires on {expiry_str} "
-                f"(in {days_remaining} day{'s' if days_remaining != 1 else ''}). "
-                "Check your medicine cabinet."
-            )
+            expiry_str = expiry.strftime("%m/%Y")
+            message = f"⚠ {nombre} expires {expiry_str}. Check your medicine cabinet."
             hass.services.async_call(
                 "persistent_notification",
                 "create",
