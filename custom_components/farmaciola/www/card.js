@@ -198,36 +198,38 @@ class FarmaciolaCard extends HTMLElement {
   _filtered() {
     let meds = this._medicines;
     if (this._statFilter === "expired") {
-      meds = meds.filter((m) => this._days(m.fecha_caducidad) !== null && this._days(m.fecha_caducidad) < 0);
+      meds = meds.filter((m) => this._expiryStatus(m.fecha_caducidad) === "expired");
     } else if (this._statFilter === "expiring") {
-      meds = meds.filter((m) => { const d = this._days(m.fecha_caducidad); return d !== null && d >= 0 && d <= 30; });
+      meds = meds.filter((m) => this._expiryStatus(m.fecha_caducidad) === "expiring");
     }
     if (!this._filter) return meds;
     const q = this._filter.toLowerCase();
     return meds.filter((m) => (m.nombre || "").toLowerCase().includes(q));
   }
 
-  _days(fecha) {
+  _expiryStatus(fecha) {
     if (!fecha) return null;
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return Math.floor((new Date(fecha) - today) / 86400000);
+    const y = today.getFullYear(), m = today.getMonth();
+    const exp = new Date(fecha);
+    const ey = exp.getFullYear(), em = exp.getMonth();
+    if (y > ey || (y === ey && m > em)) return "expired";
+    if (y === ey && m === em) return "expiring";
+    return "ok";
   }
 
   _expiryText(fecha) {
-    const d = this._days(fecha);
-    if (d === null) return "—";
-    if (d < 0) return "EXPIRED";
-    if (d === 0) return "Today";
-    if (d <= 30) return `${d}d`;
+    const s = this._expiryStatus(fecha);
+    if (s === null) return "—";
+    if (s === "expired") return "EXPIRED";
     return new Date(fecha).toLocaleDateString("es-ES", { month: "short", year: "numeric" });
   }
 
   _expiryColor(fecha) {
-    const d = this._days(fecha);
-    if (d === null) return "var(--secondary-text-color)";
-    if (d < 0) return "var(--error-color, #c62828)";
-    if (d <= 30) return "var(--warning-color, #f57f17)";
+    const s = this._expiryStatus(fecha);
+    if (s === null) return "var(--secondary-text-color)";
+    if (s === "expired") return "var(--error-color, #c62828)";
+    if (s === "expiring") return "var(--warning-color, #f57f17)";
     return "var(--success-color, #43a047)";
   }
 
@@ -274,8 +276,8 @@ class FarmaciolaCard extends HTMLElement {
     const el = this.shadowRoot.getElementById("stats");
     if (!el) return;
     const total = this._medicines.length;
-    const expired = this._medicines.filter((m) => { const d = this._days(m.fecha_caducidad); return d !== null && d < 0; }).length;
-    const expiring = this._medicines.filter((m) => { const d = this._days(m.fecha_caducidad); return d !== null && d >= 0 && d <= 30; }).length;
+    const expired = this._medicines.filter((m) => this._expiryStatus(m.fecha_caducidad) === "expired").length;
+    const expiring = this._medicines.filter((m) => this._expiryStatus(m.fecha_caducidad) === "expiring").length;
     const sf = this._statFilter;
     el.innerHTML = `
       <div class="stats-bar">
