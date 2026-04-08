@@ -194,7 +194,23 @@ class FarmaciolaPanel extends HTMLElement {
     }
     if (!this._filter) return meds;
     const q = this._filter.toLowerCase();
-    return meds.filter((m) => (m.nombre || "").toLowerCase().includes(q));
+    const nameMatch = (m) => (m.nombre || "").toLowerCase().includes(q);
+    const descMatch = (m) => [
+      m.dosis,
+      m.laboratorio,
+      m.forma_farmaceutica,
+      m.via_administracion,
+      ...(m.principios_activos || []),
+      m.notas,
+    ].some((v) => v && v.toLowerCase().includes(q));
+    return meds
+      .filter((m) => nameMatch(m) || descMatch(m))
+      .sort((a, b) => {
+        const an = nameMatch(a), bn = nameMatch(b);
+        if (an && !bn) return -1;
+        if (!an && bn) return 1;
+        return 0;
+      });
   }
 
   _expiryStatus(fecha) {
