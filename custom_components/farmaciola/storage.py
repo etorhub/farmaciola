@@ -20,6 +20,15 @@ class FarmaciolaStorage:
     def get_all(self) -> list[dict]:
         return list(self._data.values())
 
+    def get_list(self) -> list[dict]:
+        """Return all medicines without foto_manual for lightweight list responses."""
+        result = []
+        for med in self._data.values():
+            item = {k: v for k, v in med.items() if k != "foto_manual"}
+            item["has_foto_manual"] = bool(med.get("foto_manual"))
+            result.append(item)
+        return result
+
     def get_by_id(self, medicine_id: str) -> dict | None:
         return self._data.get(medicine_id)
 

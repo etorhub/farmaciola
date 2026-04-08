@@ -9,7 +9,7 @@ class MedicinesView(HomeAssistantView):
 
     async def get(self, request):
         storage = request.app["hass"].data[DOMAIN]["storage"]
-        return self.json(storage.get_all())
+        return self.json(storage.get_list())
 
     async def post(self, request):
         storage = request.app["hass"].data[DOMAIN]["storage"]
@@ -26,6 +26,13 @@ class MedicineView(HomeAssistantView):
     url = "/api/farmaciola/medicines/{medicine_id}"
     name = "api:farmaciola:medicine"
     requires_auth = True
+
+    async def get(self, request, medicine_id):
+        storage = request.app["hass"].data[DOMAIN]["storage"]
+        med = storage.get_by_id(medicine_id)
+        if med is None:
+            return self.json({"error": "Not found"}, status_code=404)
+        return self.json(med)
 
     async def put(self, request, medicine_id):
         storage = request.app["hass"].data[DOMAIN]["storage"]

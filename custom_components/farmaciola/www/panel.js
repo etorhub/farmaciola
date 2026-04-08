@@ -174,6 +174,8 @@ class FarmaciolaPanel extends HTMLElement {
   }
 
   async _loadMedicines() {
+    const list = this.shadowRoot.getElementById("list");
+    if (list) list.innerHTML = `<div class="empty">Loading…</div>`;
     try {
       this._medicines = await this._api("GET", "medicines");
     } catch {
@@ -224,9 +226,9 @@ class FarmaciolaPanel extends HTMLElement {
 
   _thumbHtml(m, cls = "med-thumb") {
     if (m.foto_url)
-      return `<div class="${cls}"><img src="${m.foto_url}" alt="" /></div>`;
+      return `<div class="${cls}"><img src="${m.foto_url}" alt="" loading="lazy" /></div>`;
     if (m.foto_manual)
-      return `<div class="${cls}"><img src="data:image/jpeg;base64,${m.foto_manual}" alt="" /></div>`;
+      return `<div class="${cls}"><img src="data:image/jpeg;base64,${m.foto_manual}" alt="" loading="lazy" /></div>`;
     return `<div class="${cls}"><span class="thumb-ph">💊</span></div>`;
   }
 
@@ -327,16 +329,14 @@ class FarmaciolaPanel extends HTMLElement {
     return this.shadowRoot.getElementById("modal-overlay");
   }
 
-  _openDetail(med) {
-    const ov = this._ov();
-    ov.classList.remove("hidden");
+  _renderDetail(ov, med) {
     ov.innerHTML = `
       <div class="modal">
         <div class="modal-header"><span class="modal-title">Medicine Detail</span><span class="close-btn" id="cls">✕</span></div>
         <div class="detail-img-wrap">
           ${
             med.foto_url
-              ? `<img class="detail-img" src="${med.foto_url}" alt="" />`
+              ? `<img class="detail-img" src="${med.foto_url}" alt="" loading="lazy" />`
               : med.foto_manual
                 ? `<img class="detail-img" src="data:image/jpeg;base64,${med.foto_manual}" alt="" />`
                 : `<div class="detail-img-ph">💊</div>`
@@ -360,15 +360,32 @@ class FarmaciolaPanel extends HTMLElement {
           <button class="btn-primary" id="editBtn">✏️ Edit</button>
         </div>
       </div>`;
-    ov.querySelector("#cls").addEventListener("click", () =>
-      this._closeModal()
-    );
-    ov.querySelector("#delBtn").addEventListener("click", () =>
-      this._delete(med.id)
-    );
-    ov.querySelector("#editBtn").addEventListener("click", () =>
-      this._openEdit(med)
-    );
+    ov.querySelector("#cls").addEventListener("click", () => this._closeModal());
+    ov.querySelector("#delBtn").addEventListener("click", () => this._delete(med.id));
+    ov.querySelector("#editBtn").addEventListener("click", () => this._openEdit(med));
+  }
+
+  async _openDetail(med) {
+    const ov = this._ov();
+    ov.classList.remove("hidden");
+    // Render immediately with data we have; fetch full record (incl. foto_manual) in background
+    this._renderDetail(ov, med);
+    if (med.has_foto_manual && !med.foto_manual) {
+      try {
+        const full = await this._api("GET", `medicines/${med.id}`);
+        // Patch local cache so edit form also gets the photo
+        const idx = this._medicines.findIndex((m) => m.id === med.id);
+        if (idx !== -1) this._medicines[idx] = { ...this._medicines[idx], foto_manual: full.foto_manual };
+        // Update image if modal is still open for this medicine
+        const wrap = ov.querySelector(".detail-img-wrap");
+        if (wrap && full.foto_manual) {
+          wrap.innerHTML = `<img class="detail-img" src="data:image/jpeg;base64,${full.foto_manual}" alt="" />`;
+        }
+        med = full;
+        ov.querySelector("#editBtn").replaceWith(ov.querySelector("#editBtn").cloneNode(true));
+        ov.querySelector("#editBtn").addEventListener("click", () => this._openEdit(med));
+      } catch { /* show without photo */ }
+    }
   }
 
   _openAdd() {
