@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.7.0 (2026-04-08)
+
+### Feat
+
+- add "Sin fecha de caducidad" option to medicines
+
 ## v0.6.0 (2026-04-07)
 
 ### Feat
