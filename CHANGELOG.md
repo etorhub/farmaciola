@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.7.1 (2026-04-08)
+
+### Fix
+
+- strip foto_manual from list endpoint to fix slow panel load
+
 ## v0.7.0 (2026-04-08)
 
 ### Feat
