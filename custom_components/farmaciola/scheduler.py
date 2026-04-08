@@ -26,10 +26,7 @@ async def check_expiry_and_notify(
         if today >= expiry_month_start:
             nombre = medicine.get("nombre", "Unknown medicine")
             expiry_str = expiry.strftime("%m/%Y")
-            message = (
-                f"⚠ {nombre} expires {expiry_str}. "
-                "Check your medicine cabinet."
-            )
+            message = f"⚠ {nombre} expires {expiry_str}. Check your medicine cabinet."
             hass.services.async_call(
                 "persistent_notification",
                 "create",
