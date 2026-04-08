@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.8.0 (2026-04-08)
+
+### Feat
+
+- **frontend**: extend search to include description fields with name-first sorting
+
 ## v0.7.2 (2026-04-08)
 
 ### Fix
