@@ -41,13 +41,20 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Bump version and changelog
-        run: cz bump --yes
+        id: bump
+        run: |
+          if ! cz bump --yes; then
+            echo "No version-bumping commits since last release — skipping."
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Read released version
+        if: steps.bump.outputs.skipped != 'true'
         id: version
         run: echo "value=$(cz version -p)" >> "$GITHUB_OUTPUT"
 
       - name: Extract release notes for current version
+        if: steps.bump.outputs.skipped != 'true'
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -64,11 +71,13 @@ jobs:
           PY
 
       - name: Push release commit and tags
+        if: steps.bump.outputs.skipped != 'true'
         run: |
           git push origin main
           git push origin --tags
 
       - name: Publish GitHub release
+        if: steps.bump.outputs.skipped != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.value }}

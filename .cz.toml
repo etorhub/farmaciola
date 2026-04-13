@@ -8,5 +8,5 @@ changelog_file = "CHANGELOG.md"
 version_files = [
   "custom_components/farmaciola/manifest.json:version"
 ]
-bump_message = "chore(release): v$version [skip ci]"
+bump_message = "chore(release): v$new_version [skip ci]"
 annotated_tag = true
