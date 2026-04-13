@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.8.1 (2026-04-13)
+
+### Fix
+
+- **ci**: handle non-bumping commits and fix bump_message template
+
 ## v0.8.0 (2026-04-08)
 
 ### Feat
