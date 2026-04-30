@@ -12,27 +12,27 @@ const CSS = `
   display: flex; align-items: center; gap: 12px;
   margin-bottom: 16px; flex-wrap: wrap;
 }
-.title { font-size: 1.425rem; font-weight: 700; flex-shrink: 0; }
+.title { font-size: 1.550rem; font-weight: 700; flex-shrink: 0; }
 .search {
   flex: 1; min-width: 160px;
   background: var(--input-fill-color, var(--secondary-background-color));
   border: 1.5px solid var(--divider-color); border-radius: 999px;
-  padding: 8px 16px; font-size: 1rem; color: var(--primary-text-color); outline: none;
+  padding: 8px 16px; font-size: 1.125rem; color: var(--primary-text-color); outline: none;
 }
 .search:focus { border-color: var(--primary-color); }
 .btn-primary {
   background: var(--primary-color); color: var(--text-primary-color);
   border: none; border-radius: 999px; padding: 8px 16px;
-  font-size: 1rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+  font-size: 1.125rem; font-weight: 600; cursor: pointer; white-space: nowrap;
 }
 .btn-secondary {
   background: var(--secondary-background-color); color: var(--primary-text-color);
   border: 1.5px solid var(--divider-color); border-radius: 999px;
-  padding: 8px 16px; font-size: 1rem; font-weight: 600; cursor: pointer;
+  padding: 8px 16px; font-size: 1.125rem; font-weight: 600; cursor: pointer;
 }
 .btn-danger {
   background: var(--error-color, #c62828); color: white; border: none;
-  border-radius: 999px; padding: 8px 16px; font-size: 1rem; font-weight: 600; cursor: pointer;
+  border-radius: 999px; padding: 8px 16px; font-size: 1.125rem; font-weight: 600; cursor: pointer;
 }
 .med-row {
   display: flex; align-items: center; gap: 12px;
@@ -45,11 +45,11 @@ const CSS = `
   background: var(--secondary-background-color); display: flex; align-items: center; justify-content: center;
 }
 .med-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.thumb-ph { font-size: 1.325rem; }
+.thumb-ph { font-size: 1.450rem; }
 .med-info { flex: 1; min-width: 0; }
-.med-name { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.med-sub { font-size: 0.875rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.med-expiry { font-size: 0.875rem; font-weight: 600; flex-shrink: 0; text-align: right; }
+.med-name { font-size: 1.125rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.med-sub { font-size: 1rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.med-expiry { font-size: 1rem; font-weight: 600; flex-shrink: 0; text-align: right; }
 .empty { text-align: center; color: var(--secondary-text-color); padding: 40px 20px; }
 .link { color: var(--primary-color); cursor: pointer; text-decoration: underline; }
 .hidden { display: none !important; }
@@ -65,13 +65,13 @@ const CSS = `
 .stat-card.active { border-color: var(--primary-color); }
 .stat-card.active-warn { border-color: var(--warning-color, #f57f17); }
 .stat-card.active-danger { border-color: var(--error-color, #c62828); }
-.stat-num { font-size: 1.525rem; font-weight: 700; line-height: 1; }
+.stat-num { font-size: 1.650rem; font-weight: 700; line-height: 1; }
 .stat-num.ok { color: var(--success-color, #43a047); }
 .stat-num.warn { color: var(--warning-color, #f57f17); }
 .stat-num.danger { color: var(--error-color, #c62828); }
-.stat-label { font-size: 0.745rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary-text-color); margin-top: 4px; }
+.stat-label { font-size: 0.870rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary-text-color); margin-top: 4px; }
 .section-label {
-  font-size: 0.805rem; font-weight: 700; text-transform: uppercase;
+  font-size: 0.930rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.06em; color: var(--primary-color); margin: 12px 0 8px;
 }
 #modal-overlay {
@@ -83,20 +83,20 @@ const CSS = `
   width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto;
 }
 .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.modal-title { font-size: 1.125rem; font-weight: 700; }
-.close-btn { cursor: pointer; color: var(--secondary-text-color); font-size: 1.225rem; }
+.modal-title { font-size: 1.250rem; font-weight: 700; }
+.close-btn { cursor: pointer; color: var(--secondary-text-color); font-size: 1.350rem; }
 .mode-toggle {
   display: flex; background: var(--secondary-background-color);
   border-radius: 999px; padding: 3px; margin-bottom: 16px;
 }
-.mode-btn { flex: 1; text-align: center; padding: 6px; border-radius: 999px; font-size: 0.875rem; font-weight: 600; color: var(--secondary-text-color); cursor: pointer; }
+.mode-btn { flex: 1; text-align: center; padding: 6px; border-radius: 999px; font-size: 1rem; font-weight: 600; color: var(--secondary-text-color); cursor: pointer; }
 .mode-btn.active { background: var(--card-background-color); color: var(--primary-color); box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
 .form-group { margin-bottom: 12px; position: relative; }
-.form-label { display: block; font-size: 0.805rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary-text-color); margin-bottom: 5px; }
+.form-label { display: block; font-size: 0.930rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary-text-color); margin-bottom: 5px; }
 .form-input {
   width: 100%; background: var(--input-fill-color, var(--secondary-background-color));
   border: 1.5px solid var(--divider-color); border-radius: 12px;
-  padding: 9px 14px; font-size: 1rem; color: var(--primary-text-color); box-sizing: border-box; outline: none;
+  padding: 9px 14px; font-size: 1.125rem; color: var(--primary-text-color); box-sizing: border-box; outline: none;
 }
 .form-input:focus { border-color: var(--primary-color); }
 .ac-dropdown {
@@ -113,26 +113,26 @@ const CSS = `
 .ac-thumb { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; background: var(--secondary-background-color); object-fit: cover; }
 .ac-thumb-ph { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; background: var(--secondary-background-color); display: flex; align-items: center; justify-content: center; }
 .ac-info { flex: 1; min-width: 0; }
-.ac-name { font-size: 0.875rem; font-weight: 600; }
-.ac-sub { font-size: 0.775rem; color: var(--secondary-text-color); }
-.ac-pill { font-size: 0.775rem; background: var(--primary-color); color: var(--text-primary-color); border-radius: 999px; padding: 2px 8px; font-weight: 600; flex-shrink: 0; }
+.ac-name { font-size: 1rem; font-weight: 600; }
+.ac-sub { font-size: 0.900rem; color: var(--secondary-text-color); }
+.ac-pill { font-size: 0.900rem; background: var(--primary-color); color: var(--text-primary-color); border-radius: 999px; padding: 2px 8px; font-weight: 600; flex-shrink: 0; }
 .sel-preview { display: flex; align-items: center; gap: 10px; background: var(--secondary-background-color); border-radius: 12px; padding: 10px 12px; margin-bottom: 14px; }
 .sel-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
-.sel-thumb-ph { width: 40px; height: 40px; border-radius: 8px; background: var(--divider-color); display: flex; align-items: center; justify-content: center; font-size: 1.425rem; }
+.sel-thumb-ph { width: 40px; height: 40px; border-radius: 8px; background: var(--divider-color); display: flex; align-items: center; justify-content: center; font-size: 1.550rem; }
 .sel-info { flex: 1; min-width: 0; }
-.sel-name { font-size: 0.945rem; font-weight: 700; }
-.sel-sub { font-size: 0.805rem; color: var(--secondary-text-color); }
+.sel-name { font-size: 1.070rem; font-weight: 700; }
+.sel-sub { font-size: 0.930rem; color: var(--secondary-text-color); }
 .detail-img-wrap { text-align: center; margin-bottom: 12px; }
 .detail-img { width: 80px; height: 80px; border-radius: 16px; object-fit: cover; }
-.detail-img-ph { width: 80px; height: 80px; border-radius: 16px; background: var(--secondary-background-color); display: inline-flex; align-items: center; justify-content: center; font-size: 2.625rem; }
-.detail-name { font-size: 1.125rem; font-weight: 700; text-align: center; margin-bottom: 2px; }
-.detail-sub { font-size: 0.925rem; color: var(--secondary-text-color); text-align: center; margin-bottom: 12px; }
+.detail-img-ph { width: 80px; height: 80px; border-radius: 16px; background: var(--secondary-background-color); display: inline-flex; align-items: center; justify-content: center; font-size: 2.750rem; }
+.detail-name { font-size: 1.250rem; font-weight: 700; text-align: center; margin-bottom: 2px; }
+.detail-sub { font-size: 1.050rem; color: var(--secondary-text-color); text-align: center; margin-bottom: 12px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 14px; }
-.chip { font-size: 0.805rem; font-weight: 600; border-radius: 999px; padding: 3px 10px; }
+.chip { font-size: 0.930rem; font-weight: 600; border-radius: 999px; padding: 3px 10px; }
 .chip-p { background: color-mix(in srgb, var(--primary-color) 15%, transparent); color: var(--primary-color); }
 .chip-r { background: color-mix(in srgb, var(--error-color, #c62828) 15%, transparent); color: var(--error-color, #c62828); }
 .d-rows { margin-bottom: 14px; }
-.d-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--divider-color); font-size: 0.925rem; gap: 8px; }
+.d-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--divider-color); font-size: 1.050rem; gap: 8px; }
 .d-row:last-child { border-bottom: none; }
 .d-row span:first-child { color: var(--secondary-text-color); flex-shrink: 0; }
 .d-row span:last-child { font-weight: 600; text-align: right; }
@@ -471,7 +471,7 @@ class FarmaciolaPanel extends HTMLElement {
           <div class="form-group"><label class="form-label">Photo (optional)</label><input class="form-input" id="mPhoto" type="file" accept="image/*" /></div>`
         }
         <div class="form-group" id="expiryRow"${this._form.no_caduca ? ' style="display:none"' : ''}><label class="form-label">Expiry date *</label><input class="form-input" id="expiry" type="month" value="${this._form.fecha_caducidad ? this._form.fecha_caducidad.substring(0, 7) : ""}" /></div>
-        <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:1rem"><input type="checkbox" id="noCaduca"${this._form.no_caduca ? ' checked' : ''}> Sin fecha de caducidad</label></div>
+        <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size: 1.125rem"><input type="checkbox" id="noCaduca"${this._form.no_caduca ? ' checked' : ''}> Sin fecha de caducidad</label></div>
         <div class="form-group"><label class="form-label">Notes</label><input class="form-input" id="notes" type="text" placeholder="Optional..." value="${this._form.notas || ""}" /></div>
         <div class="modal-actions">
           <button class="btn-secondary" id="cancelBtn">Cancel</button>
