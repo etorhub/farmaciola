@@ -10,3 +10,4 @@ version_files = [
 ]
 bump_message = "chore(release): v$new_version [skip ci]"
 annotated_tag = true
+patch_version_types = ["fix", "perf", "refactor", "style"]
