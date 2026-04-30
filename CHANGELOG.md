@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.8.2 (2026-04-30)
+
+### Fix
+
+- **release**: trigger patch bump on style: commits
+
 ## v0.8.1 (2026-04-13)
 
 ### Fix
