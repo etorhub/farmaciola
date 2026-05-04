@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.8.4 (2026-05-04)
+
+### Fix
+
+- **tests**: add voluptuous to test requirements
+- **tests**: remove unused result variables to satisfy ruff F841
+
 ## v0.8.3 (2026-05-04)
 
 ### Fix
