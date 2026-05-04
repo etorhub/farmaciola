@@ -8,14 +8,17 @@ from unittest.mock import MagicMock
 # can inherit from them and define methods on the resulting subclasses.
 # ---------------------------------------------------------------------------
 
+
 class _HomeAssistantView:
     """Minimal stand-in for homeassistant.components.http.HomeAssistantView."""
+
     def json(self, data, status_code=200):
         return MagicMock()
 
 
 class _ConfigFlow:
     """Stand-in for homeassistant.config_entries.ConfigFlow."""
+
     VERSION = 1
 
     def __init_subclass__(cls, domain=None, **kwargs):
@@ -30,6 +33,7 @@ class _ConfigFlow:
 
 class _OptionsFlow:
     """Stand-in for homeassistant.config_entries.OptionsFlow."""
+
     def async_create_entry(self, **kwargs):
         return MagicMock()
 

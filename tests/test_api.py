@@ -28,6 +28,7 @@ def make_request(storage=None, cima=None, query_params=None):
 
 # --- MedicinesView ---
 
+
 async def test_medicines_get_returns_list():
     storage = MagicMock()
     storage.get_list.return_value = [{"id": "1", "nombre": "Aspirina"}]
@@ -51,7 +52,9 @@ async def test_medicines_post_valid_json():
     await MedicinesView.post(self, request)
 
     storage.add_medicine.assert_awaited_once_with({"nombre": "Test"})
-    self.json.assert_called_once_with({"id": "new-id", "nombre": "Test"}, status_code=201)
+    self.json.assert_called_once_with(
+        {"id": "new-id", "nombre": "Test"}, status_code=201
+    )
 
 
 async def test_medicines_post_invalid_json():
@@ -66,6 +69,7 @@ async def test_medicines_post_invalid_json():
 
 
 # --- MedicineView ---
+
 
 async def test_medicine_get_found():
     storage = MagicMock()
@@ -151,6 +155,7 @@ async def test_medicine_delete_not_found():
 
 # --- CimaSearchView ---
 
+
 async def test_cima_search_empty_query_returns_empty_list():
     cima = MagicMock()
     request = make_request(cima=cima, query_params={"q": ""})
@@ -196,6 +201,7 @@ async def test_cima_search_upstream_error_returns_502():
 
 
 # --- CimaDetailView ---
+
 
 async def test_cima_detail_missing_nregistro_returns_400():
     cima = MagicMock()
