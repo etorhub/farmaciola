@@ -109,3 +109,21 @@ async def test_mark_notified_twice_succeeds(storage):
     second_notified_at = s.get_by_id(med_id)["notified_at"]
     assert second_notified_at is not None
     assert mock_store.async_save.call_count == 2
+
+
+async def test_get_list_excludes_foto_manual(storage_only):
+    await storage_only.add_medicine({"nombre": "A", "foto_manual": "base64data"})
+    await storage_only.add_medicine({"nombre": "B"})
+    result = storage_only.get_list()
+    assert len(result) == 2
+    for item in result:
+        assert "foto_manual" not in item
+        assert "has_foto_manual" in item
+    with_foto = next(r for r in result if r["nombre"] == "A")
+    without_foto = next(r for r in result if r["nombre"] == "B")
+    assert with_foto["has_foto_manual"] is True
+    assert without_foto["has_foto_manual"] is False
+
+
+async def test_mark_notified_nonexistent_is_noop(storage_only):
+    await storage_only.mark_notified("nonexistent-id")
