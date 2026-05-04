@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.8.3 (2026-05-04)
+
+### Fix
+
+- close Detail modal on Escape key press
+
 ## v0.8.2 (2026-04-30)
 
 ### Fix
