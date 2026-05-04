@@ -277,6 +277,11 @@ class FarmaciolaPanel extends HTMLElement {
       .addEventListener("click", (e) => {
         if (e.target.id === "modal-overlay") this._closeModal();
       });
+    this._onKeyDown = (e) => {
+      if (e.key === "Escape" && !this._ov().classList.contains("hidden"))
+        this._closeModal();
+    };
+    document.addEventListener("keydown", this._onKeyDown);
   }
 
   _renderStats() {
