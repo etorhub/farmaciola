@@ -113,6 +113,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await _async_register_http(hass)
 
     # Sidebar panel (async_remove_panel in unload avoids duplicate on reload)
+    panel_js = f"/farmaciola_static/panel.js?v={ver}"
     async_register_built_in_panel(
         hass,
         component_name="custom",
@@ -122,7 +123,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         config={
             "_panel_custom": {
                 "name": "farmaciola-panel",
-                "module_url": "/farmaciola_static/panel.js",
+                "module_url": panel_js,
             }
         },
         require_admin=False,

@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.9.0 (2026-06-01)
+
+### Feat
+
+- **panel**: add Reminder settings in the sidebar panel (enable/disable, notification center vs mobile push, notify service picker)
+- **scheduler**: respect panel notification preferences instead of always sending both channels
+
 ## v0.8.4 (2026-05-04)
 
 ### Fix
