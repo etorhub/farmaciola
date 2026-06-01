@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.9.0 (2026-06-01)
+
+### Feat
+
+- add panel notification settings for expiry reminders (#21)
+
 ## v0.8.5 (2026-06-01)
 
 ### Fix
