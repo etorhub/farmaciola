@@ -138,6 +138,24 @@ const CSS = `
 .d-row span:last-child { font-weight: 600; text-align: right; }
 .modal-actions { display: flex; gap: 8px; margin-top: 4px; }
 .modal-actions button { flex: 1; }
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 14px;
+}
+.settings-row label { font-size: 1.125rem; font-weight: 500; cursor: pointer; flex: 1; }
+.settings-help {
+  font-size: 0.950rem; color: var(--secondary-text-color);
+  margin: 0 0 14px; line-height: 1.4;
+}
+.settings-error {
+  font-size: 0.950rem; color: var(--error-color, #c62828);
+  margin-bottom: 12px;
+}
+.form-check {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px; cursor: pointer; font-size: 1.125rem;
+}
+.form-check input { width: 18px; height: 18px; cursor: pointer; }
 `;
 
 class FarmaciolaPanel extends HTMLElement {
@@ -153,6 +171,7 @@ class FarmaciolaPanel extends HTMLElement {
     this._cimaQuery = "";
     this._cimaSelStart = 0;
     this._cimaDebounce = null;
+    this._notificationSettings = null;
     this._ready = false;
   }
 
@@ -166,7 +185,18 @@ class FarmaciolaPanel extends HTMLElement {
 
   async _init() {
     this._renderShell();
-    await this._loadMedicines();
+    await Promise.all([this._loadMedicines(), this._loadNotificationSettings()]);
+  }
+
+  async _loadNotificationSettings() {
+    try {
+      this._notificationSettings = await this._api(
+        "GET",
+        "notifications/settings"
+      );
+    } catch {
+      this._notificationSettings = null;
+    }
   }
 
   async _api(method, path, body) {
@@ -257,6 +287,7 @@ class FarmaciolaPanel extends HTMLElement {
         <div class="header">
           <div class="title">Farmaciola 💊</div>
           <input class="search" id="search" type="text" placeholder="Search medicines..." />
+          <button class="btn-secondary" id="settingsBtn" title="Notification settings">⚙</button>
           <button class="btn-primary" id="addBtn">+ Add</button>
         </div>
         <div id="stats"></div>
@@ -269,6 +300,9 @@ class FarmaciolaPanel extends HTMLElement {
         this._filter = e.target.value;
         this._renderList();
       });
+    this.shadowRoot
+      .getElementById("settingsBtn")
+      .addEventListener("click", () => this._openSettings());
     this.shadowRoot
       .getElementById("addBtn")
       .addEventListener("click", () => this._openAdd());
@@ -408,6 +442,120 @@ class FarmaciolaPanel extends HTMLElement {
         ov.querySelector("#editBtn").replaceWith(ov.querySelector("#editBtn").cloneNode(true));
         ov.querySelector("#editBtn").addEventListener("click", () => this._openEdit(med));
       } catch { /* show without photo */ }
+    }
+  }
+
+  async _openSettings() {
+    const ov = this._ov();
+    ov.classList.remove("hidden");
+    ov.innerHTML = `<div class="modal"><div class="empty">Loading…</div></div>`;
+    let data = this._notificationSettings;
+    try {
+      data = await this._api("GET", "notifications/settings");
+      this._notificationSettings = data;
+    } catch {
+      ov.innerHTML = `<div class="modal"><div class="settings-error">Could not load notification settings.</div><button class="btn-secondary" id="cls">Close</button></div>`;
+      ov.querySelector("#cls").addEventListener("click", () => this._closeModal());
+      return;
+    }
+    this._renderSettingsModal(data);
+  }
+
+  _renderSettingsModal(data) {
+    const ov = this._ov();
+    const services = data.available_notify_services || [];
+    const current = data.notify_service || "notify.notify";
+    const options =
+      services.length > 0
+        ? services
+        : [current];
+    const uniqueOptions = [...new Set([...options, current])].sort();
+    const selectOptions = uniqueOptions
+      .map(
+        (s) =>
+          `<option value="${s}"${s === current ? " selected" : ""}>${s}</option>`
+      )
+      .join("");
+
+    ov.innerHTML = `
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title">Reminder settings</span>
+          <span class="close-btn" id="cls">✕</span>
+        </div>
+        <div class="settings-row">
+          <label for="nEnabled">Enable expiry reminders</label>
+          <input type="checkbox" id="nEnabled"${data.enabled ? " checked" : ""} />
+        </div>
+        <p class="settings-help">
+          Reminders are sent once per medicine during its expiry month (when the calendar reaches that month).
+        </p>
+        <div class="form-label">Delivery</div>
+        <label class="form-check">
+          <input type="checkbox" id="nPersistent"${data.notify_persistent ? " checked" : ""} />
+          Notification center (Home Assistant)
+        </label>
+        <label class="form-check">
+          <input type="checkbox" id="nMobile"${data.notify_mobile ? " checked" : ""} />
+          Mobile push
+        </label>
+        <div class="form-group">
+          <label class="form-label" for="nService">Notify service</label>
+          <select class="form-input" id="nService"${data.notify_mobile ? "" : " disabled"}>
+            ${selectOptions}
+          </select>
+        </div>
+        <div id="settingsErr" class="settings-error hidden"></div>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="cancelBtn">Cancel</button>
+          <button class="btn-primary" id="saveBtn">Save</button>
+        </div>
+      </div>`;
+
+    const enabledEl = ov.querySelector("#nEnabled");
+    const persistentEl = ov.querySelector("#nPersistent");
+    const mobileEl = ov.querySelector("#nMobile");
+    const serviceEl = ov.querySelector("#nService");
+
+    const syncChannelState = () => {
+      const on = enabledEl.checked;
+      persistentEl.disabled = !on;
+      mobileEl.disabled = !on;
+      serviceEl.disabled = !on || !mobileEl.checked;
+    };
+    syncChannelState();
+
+    enabledEl.addEventListener("change", syncChannelState);
+    mobileEl.addEventListener("change", syncChannelState);
+
+    ov.querySelector("#cls").addEventListener("click", () => this._closeModal());
+    ov.querySelector("#cancelBtn").addEventListener("click", () => this._closeModal());
+    ov.querySelector("#saveBtn").addEventListener("click", () =>
+      this._saveSettings()
+    );
+  }
+
+  async _saveSettings() {
+    const ov = this._ov();
+    const errEl = ov.querySelector("#settingsErr");
+    const body = {
+      enabled: ov.querySelector("#nEnabled").checked,
+      notify_persistent: ov.querySelector("#nPersistent").checked,
+      notify_mobile: ov.querySelector("#nMobile").checked,
+      notify_service: ov.querySelector("#nService").value,
+    };
+    try {
+      this._notificationSettings = await this._api(
+        "PUT",
+        "notifications/settings",
+        body
+      );
+      this._closeModal();
+    } catch (e) {
+      let msg = "Could not save settings. Please try again.";
+      if (e?.body?.error) msg = e.body.error;
+      errEl.textContent = msg;
+      errEl.classList.remove("hidden");
     }
   }
 

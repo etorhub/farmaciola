@@ -7,9 +7,19 @@ from homeassistant.helpers.event import async_track_time_interval
 _LOGGER = logging.getLogger(__name__)
 
 
-async def check_expiry_and_notify(
-    hass: HomeAssistant, storage, notify_service: str
-) -> None:
+def _notify_service_exists(hass: HomeAssistant, notify_service: str) -> bool:
+    if not notify_service or "." not in notify_service:
+        return False
+    domain, service = notify_service.split(".", 1)
+    if domain != "notify":
+        return False
+    return service in hass.services.async_services().get("notify", {})
+
+
+async def check_expiry_and_notify(hass: HomeAssistant, storage, settings: dict) -> None:
+    if not settings.get("enabled"):
+        return
+
     today = date.today()
     for medicine in storage.get_all():
         if medicine.get("no_caduca"):
@@ -23,34 +33,52 @@ async def check_expiry_and_notify(
         except ValueError:
             continue
         expiry_month_start = date(expiry.year, expiry.month, 1)
-        if today >= expiry_month_start:
-            nombre = medicine.get("nombre", "Unknown medicine")
-            expiry_str = expiry.strftime("%m/%Y")
-            message = f"⚠ {nombre} expires {expiry_str}. Check your medicine cabinet."
+        if today < expiry_month_start:
+            continue
+
+        nombre = medicine.get("nombre", "Unknown medicine")
+        expiry_str = expiry.strftime("%m/%Y")
+        message = f"⚠ {nombre} expires {expiry_str}. Check your medicine cabinet."
+        title = "Medicine expiring soon"
+        mobile_title = "⚠ Medicine expiring soon"
+        sent = False
+
+        if settings.get("notify_persistent"):
             hass.services.async_call(
                 "persistent_notification",
                 "create",
                 {
-                    "title": "Medicine expiring soon",
+                    "title": title,
                     "message": message,
                     "notification_id": f"farmaciola_{medicine['id']}",
                 },
             )
-            parts = notify_service.split(".", 1)
-            domain = parts[0]
-            service = parts[1] if len(parts) > 1 else "notify"
-            hass.services.async_call(
-                domain,
-                service,
-                {"title": "⚠ Medicine expiring soon", "message": message},
-            )
+            sent = True
+
+        if settings.get("notify_mobile"):
+            notify_service = settings.get("notify_service") or ""
+            if _notify_service_exists(hass, notify_service):
+                domain, service = notify_service.split(".", 1)
+                hass.services.async_call(
+                    domain,
+                    service,
+                    {"title": mobile_title, "message": message},
+                )
+                sent = True
+            elif notify_service:
+                _LOGGER.warning(
+                    "Farmaciola: notify service %s is not available; skipping mobile alert",
+                    notify_service,
+                )
+
+        if sent:
             await storage.mark_notified(medicine["id"])
 
 
-async def async_setup_scheduler(hass: HomeAssistant, storage, notify_service: str):
+async def async_setup_scheduler(hass: HomeAssistant, storage, settings_store):
     async def _tick(now=None):
         try:
-            await check_expiry_and_notify(hass, storage, notify_service)
+            await check_expiry_and_notify(hass, storage, settings_store.get())
         except Exception:
             _LOGGER.exception("Farmaciola expiry notification run failed")
 
