@@ -10,7 +10,14 @@ from homeassistant.components.frontend import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .api import CimaDetailView, CimaSearchView, MedicineView, MedicinesView
+from .api import (
+    CimaDetailView,
+    CimaSearchView,
+    MedicineView,
+    MedicinesView,
+    NotificationSettingsView,
+)
+from .notification_settings import NotificationSettingsStore
 from .cima import CimaClient
 from .const import CONF_NOTIFY_SERVICE, DEFAULT_NOTIFY_SERVICE, DOMAIN
 from .scheduler import async_setup_scheduler
@@ -58,6 +65,7 @@ async def _async_register_http(hass: HomeAssistant) -> None:
     hass.http.register_view(MedicineView())
     hass.http.register_view(CimaSearchView())
     hass.http.register_view(CimaDetailView())
+    hass.http.register_view(NotificationSettingsView())
 
     www_path = hass.config.path("custom_components/farmaciola/www")
     if hasattr(hass.http, "async_register_static_paths"):
@@ -90,12 +98,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     storage = await FarmaciolaStorage(hass).async_load()
     session = aiohttp.ClientSession()
     cima = CimaClient(session)
-    notify_service = entry.data.get(CONF_NOTIFY_SERVICE, DEFAULT_NOTIFY_SERVICE)
+    seed_notify = entry.data.get(CONF_NOTIFY_SERVICE, DEFAULT_NOTIFY_SERVICE)
+    notification_settings = await NotificationSettingsStore(hass).async_load(
+        seed_notify_service=seed_notify
+    )
 
     hass.data[DOMAIN] = {
         "storage": storage,
         "cima": cima,
         "session": session,
+        "notification_settings": notification_settings,
     }
 
     await _async_register_http(hass)
@@ -117,7 +129,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     # Start expiry scheduler
-    unsub = await async_setup_scheduler(hass, storage, notify_service)
+    unsub = await async_setup_scheduler(hass, storage, notification_settings)
     hass.data[DOMAIN]["unsub_scheduler"] = unsub
 
     _LOGGER.info(

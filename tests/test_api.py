@@ -5,18 +5,25 @@ from custom_components.farmaciola.api import (
     CimaSearchView,
     MedicineView,
     MedicinesView,
+    NotificationSettingsView,
 )
-from custom_components.farmaciola.const import DOMAIN
+from custom_components.farmaciola.const import DEFAULT_NOTIFICATION_SETTINGS, DOMAIN
 
 
-def make_request(storage=None, cima=None, query_params=None):
+def make_request(
+    storage=None, cima=None, notification_settings=None, query_params=None
+):
     request = MagicMock()
-    request.app = {"hass": MagicMock()}
-    request.app["hass"].data = {DOMAIN: {}}
+    hass = MagicMock()
+    hass.data = {DOMAIN: {}}
+    hass.services.async_services.return_value = {"notify": {"notify": {}}}
+    request.app = {"hass": hass}
     if storage is not None:
-        request.app["hass"].data[DOMAIN]["storage"] = storage
+        hass.data[DOMAIN]["storage"] = storage
     if cima is not None:
-        request.app["hass"].data[DOMAIN]["cima"] = cima
+        hass.data[DOMAIN]["cima"] = cima
+    if notification_settings is not None:
+        hass.data[DOMAIN]["notification_settings"] = notification_settings
     request.query = query_params or {}
     return request
 
@@ -234,3 +241,95 @@ async def test_cima_detail_upstream_error_returns_502():
     await CimaDetailView.get(self, request)
 
     self.json.assert_called_once_with({"error": "CIMA error"}, status_code=502)
+
+
+# --- NotificationSettingsView ---
+
+
+async def test_notification_settings_get():
+    settings_store = MagicMock()
+    settings_store.get.return_value = dict(DEFAULT_NOTIFICATION_SETTINGS)
+    request = make_request(notification_settings=settings_store)
+    self = MagicMock()
+
+    await NotificationSettingsView.get(self, request)
+
+    payload = self.json.call_args.args[0]
+    assert payload["enabled"] is True
+    assert "available_notify_services" in payload
+    assert payload["available_notify_services"] == ["notify.notify"]
+
+
+async def test_notification_settings_put_success():
+    settings_store = MagicMock()
+    settings_store.get.return_value = {
+        **DEFAULT_NOTIFICATION_SETTINGS,
+        "enabled": False,
+    }
+    settings_store.async_update = AsyncMock(
+        return_value={**DEFAULT_NOTIFICATION_SETTINGS, "enabled": False}
+    )
+    request = make_request(notification_settings=settings_store)
+    request.json = AsyncMock(
+        return_value={
+            "enabled": False,
+            "notify_persistent": True,
+            "notify_mobile": True,
+            "notify_service": "notify.notify",
+        }
+    )
+    self = MagicMock()
+
+    await NotificationSettingsView.put(self, request)
+
+    settings_store.async_update.assert_awaited_once()
+    self.json.assert_called_once()
+
+
+async def test_notification_settings_put_enabled_without_channel():
+    settings_store = MagicMock()
+    request = make_request(notification_settings=settings_store)
+    request.json = AsyncMock(
+        return_value={
+            "enabled": True,
+            "notify_persistent": False,
+            "notify_mobile": False,
+            "notify_service": "notify.notify",
+        }
+    )
+    self = MagicMock()
+
+    await NotificationSettingsView.put(self, request)
+
+    self.json.assert_called_once()
+    assert self.json.call_args.kwargs["status_code"] == 400
+
+
+async def test_notification_settings_put_unknown_service():
+    settings_store = MagicMock()
+    request = make_request(notification_settings=settings_store)
+    request.json = AsyncMock(
+        return_value={
+            "enabled": True,
+            "notify_persistent": True,
+            "notify_mobile": True,
+            "notify_service": "notify.unknown_device",
+        }
+    )
+    self = MagicMock()
+
+    await NotificationSettingsView.put(self, request)
+
+    self.json.assert_called_once()
+    assert self.json.call_args.kwargs["status_code"] == 400
+
+
+async def test_notification_settings_put_invalid_json():
+    settings_store = MagicMock()
+    request = make_request(notification_settings=settings_store)
+    request.json = AsyncMock(side_effect=Exception("bad json"))
+    self = MagicMock()
+
+    await NotificationSettingsView.put(self, request)
+
+    self.json.assert_called_once_with({"error": "Invalid JSON"}, status_code=400)

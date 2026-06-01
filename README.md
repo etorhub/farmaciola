@@ -13,7 +13,7 @@ A Home Assistant custom integration that turns your instance into a smart medici
 
 - **Dedicated Lovelace panel** — browse and manage all your medicines in one place, without editing any YAML
 - **CIMA medicine search** — look up any medicine registered with the Spanish Agency of Medicines (AEMPS) and import its name, manufacturer, and photo with one tap
-- **Expiry tracking** — set expiry dates and get automatic Home Assistant notifications 7 days before a medicine expires
+- **Expiry tracking** — set expiry dates and get automatic reminders during the expiry month
 - **Dashboard stats bar** — see at a glance how many medicines are OK, expiring soon, or already expired; click any card to filter the list
 - **Persistent storage** — your medicine data is stored locally and survives restarts
 
@@ -40,13 +40,13 @@ A Home Assistant custom integration that turns your instance into a smart medici
 
 ## Configuration
 
-After adding the integration you will be asked for:
+During setup you can optionally set a default **notify service** (`notify.notify` by default). That value seeds the panel settings on first run.
 
-| Option | Default | Description |
-|---|---|---|
-| Notify service | `notify.notify` | Home Assistant notification service used for expiry alerts |
+**Reminder delivery** is configured in the Farmaciola panel: open the sidebar app and click **⚙** (Reminder settings). There you can:
 
-You can change this at any time from the integration's **Configure** option.
+- Turn expiry reminders on or off
+- Choose **Notification center** (Home Assistant bell), **Mobile push**, or both
+- Pick which `notify.*` service receives mobile alerts (dropdown of services discovered in your instance)
 
 ---
 
@@ -64,7 +64,7 @@ Once installed, a **Farmaciola** entry appears in your Home Assistant sidebar.
 
 ### Expiry alerts
 
-Farmaciola checks expiry dates every hour. When a medicine is 7 days or fewer from expiry you will receive a persistent Home Assistant notification. Each medicine notifies only once.
+Farmaciola checks expiry dates every 24 hours. When the calendar reaches a medicine's **expiry month**, you receive a reminder through the channels you enabled in **Reminder settings**. Each medicine notifies only once. If reminders are disabled, nothing is sent and medicines remain eligible for a future alert when you turn reminders back on.
 
 ### Stats bar
 

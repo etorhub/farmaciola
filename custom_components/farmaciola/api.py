@@ -1,5 +1,67 @@
 from homeassistant.components.http import HomeAssistantView
+
 from .const import DOMAIN
+from .notification_settings import get_available_notify_services
+
+
+def _validate_notification_settings(hass, body: dict) -> str | None:
+    """Return an error message if invalid, else None."""
+    enabled = bool(body.get("enabled"))
+    notify_persistent = bool(body.get("notify_persistent"))
+    notify_mobile = bool(body.get("notify_mobile"))
+    notify_service = (body.get("notify_service") or "").strip()
+
+    if enabled and not notify_persistent and not notify_mobile:
+        return "At least one delivery channel is required when reminders are enabled"
+
+    if notify_mobile:
+        if not notify_service.startswith("notify."):
+            return "notify_service must be a notify.* service (e.g. notify.notify)"
+        available = get_available_notify_services(hass)
+        if notify_service not in available:
+            return f"Unknown notify service: {notify_service}"
+
+    return None
+
+
+def _settings_response(hass, settings_store):
+    settings = settings_store.get()
+    return {
+        **settings,
+        "available_notify_services": get_available_notify_services(hass),
+    }
+
+
+class NotificationSettingsView(HomeAssistantView):
+    url = "/api/farmaciola/notifications/settings"
+    name = "api:farmaciola:notifications:settings"
+    requires_auth = True
+
+    async def get(self, request):
+        hass = request.app["hass"]
+        settings_store = hass.data[DOMAIN]["notification_settings"]
+        return self.json(_settings_response(hass, settings_store))
+
+    async def put(self, request):
+        hass = request.app["hass"]
+        settings_store = hass.data[DOMAIN]["notification_settings"]
+        try:
+            body = await request.json()
+        except Exception:
+            return self.json({"error": "Invalid JSON"}, status_code=400)
+
+        updates = {
+            "enabled": bool(body.get("enabled")),
+            "notify_persistent": bool(body.get("notify_persistent")),
+            "notify_mobile": bool(body.get("notify_mobile")),
+            "notify_service": (body.get("notify_service") or "").strip(),
+        }
+        error = _validate_notification_settings(hass, updates)
+        if error:
+            return self.json({"error": error}, status_code=400)
+
+        await settings_store.async_update(updates)
+        return self.json(_settings_response(hass, settings_store))
 
 
 class MedicinesView(HomeAssistantView):
