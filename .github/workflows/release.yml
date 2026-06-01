@@ -5,8 +5,12 @@ on:
     workflows: ["CI"]
     types: [completed]
 
-permissions:
-  contents: write
+# Prevent two releases from running simultaneously; never cancel a running one.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions: {}
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -15,19 +19,21 @@ jobs:
   release:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.actor != 'github-actions[bot]' && !contains(github.event.workflow_run.head_commit.message, 'chore(release):') }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: "3.12"
-          cache: "pip"
+          cache: pip
           cache-dependency-path: |
             requirements_test.txt
             requirements_dev.txt
@@ -78,7 +84,7 @@ jobs:
 
       - name: Publish GitHub release
         if: steps.bump.outputs.skipped != 'true'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           tag_name: v${{ steps.version.outputs.value }}
           name: v${{ steps.version.outputs.value }}

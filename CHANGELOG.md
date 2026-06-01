@@ -2,12 +2,25 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.9.1 (2026-06-01)
+
+### Feat
+
+- **panel**: label Reminder settings header button **Reminders** (was icon-only)
+- **panel**: cache-bust `panel.js` with integration version after updates
+
 ## v0.9.0 (2026-06-01)
 
 ### Feat
 
-- **panel**: add Reminder settings in the sidebar panel (enable/disable, notification center vs mobile push, notify service picker)
+- add panel notification settings for expiry reminders (#21)
 - **scheduler**: respect panel notification preferences instead of always sending both channels
+
+## v0.8.5 (2026-06-01)
+
+### Fix
+
+- revert pytest-asyncio to 1.3.0 (compatible with pytest 9)
 
 ## v0.8.4 (2026-05-04)
 
