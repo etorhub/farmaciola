@@ -42,7 +42,7 @@ A Home Assistant custom integration that turns your instance into a smart medici
 
 During setup you can optionally set a default **notify service** (`notify.notify` by default). That value seeds the panel settings on first run.
 
-**Reminder delivery** is configured in the Farmaciola panel: open the sidebar app and click **⚙** (Reminder settings). There you can:
+**Reminder delivery** is configured in the Farmaciola panel: open the sidebar app and click **Reminders** in the header. There you can:
 
 - Turn expiry reminders on or off
 - Choose **Notification center** (Home Assistant bell), **Mobile push**, or both

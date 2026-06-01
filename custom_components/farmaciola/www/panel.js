@@ -287,7 +287,7 @@ class FarmaciolaPanel extends HTMLElement {
         <div class="header">
           <div class="title">Farmaciola 💊</div>
           <input class="search" id="search" type="text" placeholder="Search medicines..." />
-          <button class="btn-secondary" id="settingsBtn" title="Notification settings">⚙</button>
+          <button class="btn-secondary" id="settingsBtn" title="Reminder settings">Reminders</button>
           <button class="btn-primary" id="addBtn">+ Add</button>
         </div>
         <div id="stats"></div>

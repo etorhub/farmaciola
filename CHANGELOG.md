@@ -2,11 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.9.1 (2026-06-01)
+
+### Feat
+
+- **panel**: label Reminder settings header button **Reminders** (was icon-only)
+- **panel**: cache-bust `panel.js` with integration version after updates
+
 ## v0.9.0 (2026-06-01)
 
 ### Feat
 
 - add panel notification settings for expiry reminders (#21)
+- **scheduler**: respect panel notification preferences instead of always sending both channels
 
 ## v0.8.5 (2026-06-01)
 
