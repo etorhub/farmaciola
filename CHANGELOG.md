@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.8.5 (2026-06-01)
+
+### Fix
+
+- revert pytest-asyncio to 1.3.0 (compatible with pytest 9)
+
 ## v0.8.4 (2026-05-04)
 
 ### Fix
