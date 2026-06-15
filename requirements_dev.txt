@@ -1,5 +1,5 @@
 pre-commit==4.6.0
 commitizen==4.16.3
-ruff==0.15.16
-pip-audit==2.10.0
+ruff==0.15.17
+pip-audit==2.10.1
 bandit==1.9.4
