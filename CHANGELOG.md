@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.10.0 (2026-08-25)
+
+### Feat
+
+- add hacs.json for HACS validation
+
 ## v0.9.1 (2026-06-01)
 
 ### Feat
