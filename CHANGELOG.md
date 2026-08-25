@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.10.1 (2026-08-25)
+
+### Fix
+
+- declare `http`/`frontend` dependencies and config-entry schema for hassfest
+- sort integration manifest keys for hassfest
+
+### Chore
+
+- add HACS brand assets, Validate workflow, and Spain/HA version metadata
+
 ## v0.10.0 (2026-08-25)
 
 ### Feat
