@@ -1,4 +1,5 @@
 {
   "name": "Farmaciola",
-  "render_readme": true
+  "country": "ES",
+  "homeassistant": "2025.7.0"
 }
