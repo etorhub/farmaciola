@@ -9,6 +9,7 @@ from homeassistant.components.frontend import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 
 from .api import (
     CimaDetailView,
@@ -24,6 +25,8 @@ from .scheduler import async_setup_scheduler
 from .storage import FarmaciolaStorage
 
 _LOGGER = logging.getLogger(__name__)
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 # Routes survive integration reload; register once per HA process (see _async_register_http).
 _HTTP_REGISTERED_KEY = f"{DOMAIN}_http_registered"
