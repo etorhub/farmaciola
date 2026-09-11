@@ -464,18 +464,20 @@ class FarmaciolaPanel extends HTMLElement {
   _renderSettingsModal(data) {
     const ov = this._ov();
     const services = data.available_notify_services || [];
-    const current = data.notify_service || "notify.notify";
-    const options =
-      services.length > 0
-        ? services
-        : [current];
-    const uniqueOptions = [...new Set([...options, current])].sort();
-    const selectOptions = uniqueOptions
-      .map(
-        (s) =>
-          `<option value="${s}"${s === current ? " selected" : ""}>${s}</option>`
-      )
-      .join("");
+    const current = data.notify_services || [];
+    const uniqueOptions = [...new Set([...services, ...current])].sort();
+    const checkboxesHtml =
+      uniqueOptions.length > 0
+        ? uniqueOptions
+            .map(
+              (s) => `
+        <label class="form-check">
+          <input type="checkbox" class="n-service-check" value="${s}"${current.includes(s) ? " checked" : ""} />
+          ${s}
+        </label>`
+            )
+            .join("")
+        : `<div class="settings-help">No notify services available.</div>`;
 
     ov.innerHTML = `
       <div class="modal">
@@ -500,10 +502,8 @@ class FarmaciolaPanel extends HTMLElement {
           Mobile push
         </label>
         <div class="form-group">
-          <label class="form-label" for="nService">Notify service</label>
-          <select class="form-input" id="nService"${data.notify_mobile ? "" : " disabled"}>
-            ${selectOptions}
-          </select>
+          <div class="form-label">Notify services</div>
+          <div id="nServices">${checkboxesHtml}</div>
         </div>
         <div id="settingsErr" class="settings-error hidden"></div>
         <div class="modal-actions">
@@ -515,13 +515,15 @@ class FarmaciolaPanel extends HTMLElement {
     const enabledEl = ov.querySelector("#nEnabled");
     const persistentEl = ov.querySelector("#nPersistent");
     const mobileEl = ov.querySelector("#nMobile");
-    const serviceEl = ov.querySelector("#nService");
+    const serviceEls = ov.querySelectorAll(".n-service-check");
 
     const syncChannelState = () => {
       const on = enabledEl.checked;
       persistentEl.disabled = !on;
       mobileEl.disabled = !on;
-      serviceEl.disabled = !on || !mobileEl.checked;
+      serviceEls.forEach((el) => {
+        el.disabled = !on || !mobileEl.checked;
+      });
     };
     syncChannelState();
 
@@ -538,11 +540,14 @@ class FarmaciolaPanel extends HTMLElement {
   async _saveSettings() {
     const ov = this._ov();
     const errEl = ov.querySelector("#settingsErr");
+    const notifyServices = Array.from(
+      ov.querySelectorAll(".n-service-check:checked")
+    ).map((el) => el.value);
     const body = {
       enabled: ov.querySelector("#nEnabled").checked,
       notify_persistent: ov.querySelector("#nPersistent").checked,
       notify_mobile: ov.querySelector("#nMobile").checked,
-      notify_service: ov.querySelector("#nService").value,
+      notify_services: notifyServices,
     };
     try {
       this._notificationSettings = await this._api(
