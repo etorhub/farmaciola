@@ -9,17 +9,28 @@ def _validate_notification_settings(hass, body: dict) -> str | None:
     enabled = bool(body.get("enabled"))
     notify_persistent = bool(body.get("notify_persistent"))
     notify_mobile = bool(body.get("notify_mobile"))
-    notify_service = (body.get("notify_service") or "").strip()
+    notify_services = body.get("notify_services")
+
+    if not isinstance(notify_services, list):
+        return "notify_services must be a list of notify.* services"
 
     if enabled and not notify_persistent and not notify_mobile:
         return "At least one delivery channel is required when reminders are enabled"
 
     if notify_mobile:
-        if not notify_service.startswith("notify."):
-            return "notify_service must be a notify.* service (e.g. notify.notify)"
+        if not notify_services:
+            return "At least one notify service is required when mobile push is enabled"
         available = get_available_notify_services(hass)
-        if notify_service not in available:
-            return f"Unknown notify service: {notify_service}"
+        for notify_service in notify_services:
+            if not isinstance(notify_service, str) or not notify_service.startswith(
+                "notify."
+            ):
+                return (
+                    "notify_services must contain notify.* services "
+                    f"(got: {notify_service!r})"
+                )
+            if notify_service not in available:
+                return f"Unknown notify service: {notify_service}"
 
     return None
 
@@ -50,11 +61,18 @@ class NotificationSettingsView(HomeAssistantView):
         except Exception:
             return self.json({"error": "Invalid JSON"}, status_code=400)
 
+        raw_services = body.get("notify_services")
         updates = {
             "enabled": bool(body.get("enabled")),
             "notify_persistent": bool(body.get("notify_persistent")),
             "notify_mobile": bool(body.get("notify_mobile")),
-            "notify_service": (body.get("notify_service") or "").strip(),
+            "notify_services": (
+                [s.strip() for s in raw_services if isinstance(s, str) and s.strip()]
+                if isinstance(raw_services, list)
+                else raw_services
+                if raw_services is not None
+                else []
+            ),
         }
         error = _validate_notification_settings(hass, updates)
         if error:

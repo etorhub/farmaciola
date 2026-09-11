@@ -20,7 +20,9 @@ def get_available_notify_services(hass: HomeAssistant) -> list[str]:
 
 def default_notification_settings() -> dict:
     """Return a copy of the default notification settings."""
-    return dict(DEFAULT_NOTIFICATION_SETTINGS)
+    data = dict(DEFAULT_NOTIFICATION_SETTINGS)
+    data["notify_services"] = list(DEFAULT_NOTIFICATION_SETTINGS["notify_services"])
+    return data
 
 
 class NotificationSettingsStore:
@@ -34,10 +36,15 @@ class NotificationSettingsStore:
     ) -> NotificationSettingsStore:
         raw = await self._store.async_load()
         if raw:
-            self._data = {**default_notification_settings(), **raw}
+            merged = {**default_notification_settings(), **raw}
+            if "notify_services" not in raw and "notify_service" in raw:
+                legacy = raw.get("notify_service") or ""
+                merged["notify_services"] = [legacy] if legacy else []
+            merged.pop("notify_service", None)
+            self._data = merged
         elif seed_notify_service:
             self._data = default_notification_settings()
-            self._data["notify_service"] = seed_notify_service
+            self._data["notify_services"] = [seed_notify_service]
             await self._save()
         self._loaded = True
         return self

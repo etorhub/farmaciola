@@ -10,5 +10,5 @@ DEFAULT_NOTIFICATION_SETTINGS = {
     "enabled": True,
     "notify_persistent": True,
     "notify_mobile": True,
-    "notify_service": DEFAULT_NOTIFY_SERVICE,
+    "notify_services": [DEFAULT_NOTIFY_SERVICE],
 }

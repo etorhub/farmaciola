@@ -11,12 +11,18 @@ from custom_components.farmaciola.const import DEFAULT_NOTIFICATION_SETTINGS, DO
 
 
 def make_request(
-    storage=None, cima=None, notification_settings=None, query_params=None
+    storage=None,
+    cima=None,
+    notification_settings=None,
+    query_params=None,
+    notify_services=None,
 ):
     request = MagicMock()
     hass = MagicMock()
     hass.data = {DOMAIN: {}}
-    hass.services.async_services.return_value = {"notify": {"notify": {}}}
+    hass.services.async_services.return_value = {
+        "notify": notify_services if notify_services is not None else {"notify": {}}
+    }
     request.app = {"hass": hass}
     if storage is not None:
         hass.data[DOMAIN]["storage"] = storage
@@ -275,7 +281,7 @@ async def test_notification_settings_put_success():
             "enabled": False,
             "notify_persistent": True,
             "notify_mobile": True,
-            "notify_service": "notify.notify",
+            "notify_services": ["notify.notify"],
         }
     )
     self = MagicMock()
@@ -283,6 +289,34 @@ async def test_notification_settings_put_success():
     await NotificationSettingsView.put(self, request)
 
     settings_store.async_update.assert_awaited_once()
+    self.json.assert_called_once()
+
+
+async def test_notification_settings_put_multiple_services():
+    settings_store = MagicMock()
+    settings_store.get.return_value = dict(DEFAULT_NOTIFICATION_SETTINGS)
+    settings_store.async_update = AsyncMock(
+        return_value=dict(DEFAULT_NOTIFICATION_SETTINGS)
+    )
+    request = make_request(
+        notification_settings=settings_store,
+        notify_services={"notify": {}, "mobile_app_phone": {}},
+    )
+    request.json = AsyncMock(
+        return_value={
+            "enabled": True,
+            "notify_persistent": True,
+            "notify_mobile": True,
+            "notify_services": ["notify.notify", "notify.mobile_app_phone"],
+        }
+    )
+    self = MagicMock()
+
+    await NotificationSettingsView.put(self, request)
+
+    settings_store.async_update.assert_awaited_once()
+    updated = settings_store.async_update.call_args.args[0]
+    assert updated["notify_services"] == ["notify.notify", "notify.mobile_app_phone"]
     self.json.assert_called_once()
 
 
@@ -294,7 +328,7 @@ async def test_notification_settings_put_enabled_without_channel():
             "enabled": True,
             "notify_persistent": False,
             "notify_mobile": False,
-            "notify_service": "notify.notify",
+            "notify_services": ["notify.notify"],
         }
     )
     self = MagicMock()
@@ -313,7 +347,66 @@ async def test_notification_settings_put_unknown_service():
             "enabled": True,
             "notify_persistent": True,
             "notify_mobile": True,
-            "notify_service": "notify.unknown_device",
+            "notify_services": ["notify.unknown_device"],
+        }
+    )
+    self = MagicMock()
+
+    await NotificationSettingsView.put(self, request)
+
+    self.json.assert_called_once()
+    assert self.json.call_args.kwargs["status_code"] == 400
+
+
+async def test_notification_settings_put_partially_unknown_service():
+    settings_store = MagicMock()
+    request = make_request(notification_settings=settings_store)
+    request.json = AsyncMock(
+        return_value={
+            "enabled": True,
+            "notify_persistent": True,
+            "notify_mobile": True,
+            "notify_services": ["notify.notify", "notify.unknown_device"],
+        }
+    )
+    self = MagicMock()
+
+    await NotificationSettingsView.put(self, request)
+
+    self.json.assert_called_once()
+    assert self.json.call_args.kwargs["status_code"] == 400
+    error = self.json.call_args.args[0]["error"]
+    assert "notify.unknown_device" in error
+
+
+async def test_notification_settings_put_empty_services_with_mobile_enabled():
+    settings_store = MagicMock()
+    request = make_request(notification_settings=settings_store)
+    request.json = AsyncMock(
+        return_value={
+            "enabled": True,
+            "notify_persistent": True,
+            "notify_mobile": True,
+            "notify_services": [],
+        }
+    )
+    self = MagicMock()
+
+    await NotificationSettingsView.put(self, request)
+
+    self.json.assert_called_once()
+    assert self.json.call_args.kwargs["status_code"] == 400
+
+
+async def test_notification_settings_put_not_a_list():
+    settings_store = MagicMock()
+    request = make_request(notification_settings=settings_store)
+    request.json = AsyncMock(
+        return_value={
+            "enabled": True,
+            "notify_persistent": True,
+            "notify_mobile": True,
+            "notify_services": "notify.notify",
         }
     )
     self = MagicMock()

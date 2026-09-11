@@ -56,20 +56,20 @@ async def check_expiry_and_notify(hass: HomeAssistant, storage, settings: dict) 
             sent = True
 
         if settings.get("notify_mobile"):
-            notify_service = settings.get("notify_service") or ""
-            if _notify_service_exists(hass, notify_service):
-                domain, service = notify_service.split(".", 1)
-                hass.services.async_call(
-                    domain,
-                    service,
-                    {"title": mobile_title, "message": message},
-                )
-                sent = True
-            elif notify_service:
-                _LOGGER.warning(
-                    "Farmaciola: notify service %s is not available; skipping mobile alert",
-                    notify_service,
-                )
+            for notify_service in settings.get("notify_services") or []:
+                if _notify_service_exists(hass, notify_service):
+                    domain, service = notify_service.split(".", 1)
+                    hass.services.async_call(
+                        domain,
+                        service,
+                        {"title": mobile_title, "message": message},
+                    )
+                    sent = True
+                elif notify_service:
+                    _LOGGER.warning(
+                        "Farmaciola: notify service %s is not available; skipping mobile alert",
+                        notify_service,
+                    )
 
         if sent:
             await storage.mark_notified(medicine["id"])

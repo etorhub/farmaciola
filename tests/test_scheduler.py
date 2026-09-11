@@ -28,7 +28,7 @@ def default_settings(**kwargs):
         "enabled": True,
         "notify_persistent": True,
         "notify_mobile": True,
-        "notify_service": "notify.notify",
+        "notify_services": ["notify.notify"],
         **kwargs,
     }
 
@@ -219,7 +219,71 @@ async def test_no_mark_when_both_channels_fail():
     await check_expiry_and_notify(
         hass,
         storage,
-        default_settings(notify_persistent=False, notify_service="notify.missing"),
+        default_settings(notify_persistent=False, notify_services=["notify.missing"]),
+    )
+
+    hass.services.async_call.assert_not_called()
+    storage.mark_notified.assert_not_called()
+
+
+async def test_mobile_multiple_services_all_valid():
+    hass = make_hass({"notify": {}, "mobile_app_a": {}, "mobile_app_b": {}})
+    storage = MagicMock()
+    storage.get_all.return_value = [make_medicine(_month_offset(0))]
+    storage.mark_notified = AsyncMock()
+
+    await check_expiry_and_notify(
+        hass,
+        storage,
+        default_settings(
+            notify_persistent=False,
+            notify_services=[
+                "notify.notify",
+                "notify.mobile_app_a",
+                "notify.mobile_app_b",
+            ],
+        ),
+    )
+
+    assert hass.services.async_call.call_count == 3
+    called_services = {c.args[1] for c in hass.services.async_call.call_args_list}
+    assert called_services == {"notify", "mobile_app_a", "mobile_app_b"}
+    storage.mark_notified.assert_awaited_once_with("abc-123")
+
+
+async def test_mobile_multiple_services_one_missing():
+    hass = make_hass({"notify": {}})
+    storage = MagicMock()
+    storage.get_all.return_value = [make_medicine(_month_offset(0))]
+    storage.mark_notified = AsyncMock()
+
+    await check_expiry_and_notify(
+        hass,
+        storage,
+        default_settings(
+            notify_persistent=False,
+            notify_services=["notify.notify", "notify.missing"],
+        ),
+    )
+
+    assert hass.services.async_call.call_count == 1
+    assert hass.services.async_call.call_args.args[1] == "notify"
+    storage.mark_notified.assert_awaited_once_with("abc-123")
+
+
+async def test_mobile_all_services_missing_no_mark():
+    hass = make_hass({})
+    storage = MagicMock()
+    storage.get_all.return_value = [make_medicine(_month_offset(0))]
+    storage.mark_notified = AsyncMock()
+
+    await check_expiry_and_notify(
+        hass,
+        storage,
+        default_settings(
+            notify_persistent=False,
+            notify_services=["notify.missing_a", "notify.missing_b"],
+        ),
     )
 
     hass.services.async_call.assert_not_called()
