@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## v0.11.0 (2026-09-11)
+
+### Feat
+
+- support multiple notify targets for expiry reminders (#53)
+
 ## v0.10.1 (2026-08-25)
 
 ### Fix
